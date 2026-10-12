@@ -9,10 +9,17 @@ app.use(express.urlencoded({ extended: false }));
 
 
 // Routes
+const indexRouter = require('./routes/index');
+const authRouter = require('./routes/auth');
+const postsRouter = require('./routes/posts');
+const commentsRouter = require('./routes/comments');
+const usersRouter = require('./routes/users');
 
-app.get('/', (req, res) => {
-    res.json({ message: 'Express backend is running!' });
-})
+app.use('/', indexRouter);
+app.use('/auth', authRouter);
+app.use('/posts', postsRouter);
+app.use('/comments', commentsRouter);
+app.use('/users', usersRouter);
 
 
 // Not found handler (404)
