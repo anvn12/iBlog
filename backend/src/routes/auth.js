@@ -1,107 +1,12 @@
 const express = require('express')
 const router = express.Router()
 
-const passport = require('passport')
-const LocalStrategy = require('passport-local')
-const bcrypt = require('bcrypt')
-const db = require('../services/db')
-
-// Local strategy for login with username and password
-passport.use(new LocalStrategy(async function verify(username, password, done) {
-    try {
-        const user = await db.getUserByUsername(username)
-
-        // Not found username
-        if (!user) { return done(null, false, { message: 'Incorrect username or password.' }) }
-
-        const isMatch = await bcrypt.compare(password, user.password)
-        if (!isMatch) {
-            return done(null, false, { message: 'Incorrect username or password.' })
-        }
-
-        return done(null, user)
-    } catch (err) {
-        return done(err)
-    }
-}))
+const authController = require('../controllers/auth')
 
 
-// Set up JWT
-const jwt = require('jsonwebtoken')
-function signJWTToken(user) {
-    if (!process.env.SECRET_KEY) {
-        throw new Error('SECRET_KEY environment variable is not defined')
-    }
+router.post('/login', authController.postLogin)
 
-    const SECRET_KEY = process.env.SECRET_KEY
-    const token = jwt.sign(
-        { // Payload
-            user: {
-                id: user.id,
-                username: user.username
-            }
-        },
-        SECRET_KEY,
-        { expiresIn: '7d' }
-    )
-
-    return token
-}
-
-
-// Log in
-router.post('/login', (req, res, next) => {
-    passport.authenticate('local', { session: false }, (err, user, info) => {
-        if (err) return next(err)
-        if (!user) {
-            return res.status(401).json({ error: info?.message || 'Authentication failed' })
-        }
-
-        // Log in match -> return token -> client stores it to localStorage
-
-        // Sign JWT
-        const token = signJWTToken(user)
-
-        res.json({
-            message: 'Log in successful',
-            token: token
-        })
-    })(req, res, next)
-})
-
-
-// Sign up
-router.post('/signup', async (req, res, next) => {
-    try {
-        // Get info from form body
-        const username = req.body.username
-        const password = req.body.password
-
-        // check if username exists
-        const existingUser = await db.getUserByUsername(username)
-        if (existingUser) {
-            return res.status(409).json({
-                error: 'Username already exists'
-            })
-        }
-
-        // Hash password
-        const saltRounds = 12
-        const hashedPassword = await bcrypt.hash(password, saltRounds)
-
-        // Create new user in db 
-        const newUser = await db.createNewUser(username, hashedPassword)
-        const token = signJWTToken(newUser)
-
-        res.status(201).json({
-            message: 'created new user',
-            token: token
-        })
-    } catch (err) {
-        next(err)
-    }
-})
-
+router.post('/signup', authController.postSignup)
 
 // Log out: client remove JWT on client (server not do anything)
 
