@@ -36,7 +36,8 @@ async function createNewUser(username, password) {
 
 
 // Posts
-async function getAllPosts(published = true) {
+async function getAllPosts(published = true, orderBy = { updatedAt: "desc" }) {
+    // default sort by updated time
     try {
         const posts = await prisma.post.findMany({
             select: {
@@ -52,7 +53,8 @@ async function getAllPosts(published = true) {
             },
             where: {
                 published
-            }
+            },
+            orderBy: orderBy
         })
 
         return posts
@@ -61,11 +63,28 @@ async function getAllPosts(published = true) {
     }
 }
 
+async function createNewPost(title, content = null, published = false, authorId) {
+    try {
+        const newPost = await prisma.post.create({
+            data: {
+                title,
+                content,
+                published,
+                authorId
+            }
+        })
+
+        return newPost
+    } catch (err) {
+        throw err
+    }
+}
 
 module.exports = {
     getAllUsers,
     getUserByUsername,
     createNewUser,
 
-    getAllPosts
+    getAllPosts,
+    createNewPost
 }

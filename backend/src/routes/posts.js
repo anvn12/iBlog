@@ -7,11 +7,7 @@ const postsController = require('../controllers/posts')
 
 router.get('/', postsController.getPosts)
 
-router.post('/', authenticateToken, (req, res) => {
-    res.json({
-        message: "This is post posts"
-    })
-})
+router.post('/', authenticateToken, postsController.postPosts)
 
 
 // ID 
