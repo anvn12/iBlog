@@ -25,9 +25,11 @@ model User {
 }
 
 model Post {
-  id      String  @id @default(uuid())
-  title   String
-  content String?
+  id        String   @id @default(uuid())
+  title     String
+  content   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   published Boolean @default(false)
 
@@ -36,8 +38,10 @@ model Post {
 }
 
 model Comment {
-  id      String @id @default(uuid())
-  content String
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   author   User   @relation(fields: [authorId], references: [id])
   authorId String

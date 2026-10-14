@@ -1,14 +1,13 @@
 const express = require('express')
 const router = express.Router()
 
+const { authenticateToken } = require('../utils/jwt')
 
-router.get('/', (req, res) => {
-    res.json({
-        message: "This is get posts"
-    })
-})
+const postsController = require('../controllers/posts')
 
-router.post('/', (req, res) => {
+router.get('/', postsController.getPosts)
+
+router.post('/', authenticateToken, (req, res) => {
     res.json({
         message: "This is post posts"
     })
@@ -22,13 +21,13 @@ router.get('/:id', (req, res) => {
     })
 })
 
-router.put('/:id', (req, res) => {
+router.put('/:id', authenticateToken, (req, res) => {
     res.json({
         message: "This is put posts id"
     })
 })
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', authenticateToken, (req, res) => {
     res.json({
         message: "This is delete posts id"
     })

@@ -35,8 +35,37 @@ async function createNewUser(username, password) {
 }
 
 
+// Posts
+async function getAllPosts(published = true) {
+    try {
+        const posts = await prisma.post.findMany({
+            select: {
+                id: true,
+                title: true,
+                updatedAt: true,
+                author: {
+                    select: {
+                        id: true,
+                        username: true
+                    }
+                }
+            },
+            where: {
+                published
+            }
+        })
+
+        return posts
+    } catch (err) {
+        throw err
+    }
+}
+
+
 module.exports = {
     getAllUsers,
     getUserByUsername,
-    createNewUser
+    createNewUser,
+
+    getAllPosts
 }
