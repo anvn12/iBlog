@@ -63,6 +63,39 @@ async function getAllPosts(published = true, orderBy = { updatedAt: "desc" }) {
     }
 }
 
+async function getPostById(id) {
+    try {
+        const post = await prisma.post.findUnique({
+            include: {
+                author: {
+                    select: {
+                        id: true,
+                        username: true
+                    }
+                },
+                comments: {
+                    select: {
+                        id: true,
+                        content: true,
+                        updatedAt: true,
+                        author: {
+                            select: {
+                                id: true,
+                                username: true
+                            }
+                        }
+                    }
+                }
+            },
+            where: { id }
+        })
+
+        return post
+    } catch (error) {
+        throw error
+    }
+}
+
 async function createNewPost(title, content = null, published = false, authorId) {
     try {
         const newPost = await prisma.post.create({
@@ -80,11 +113,13 @@ async function createNewPost(title, content = null, published = false, authorId)
     }
 }
 
+
 module.exports = {
     getAllUsers,
     getUserByUsername,
     createNewUser,
 
     getAllPosts,
+    getPostById,
     createNewPost
 }

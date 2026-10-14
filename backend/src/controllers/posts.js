@@ -7,7 +7,7 @@ async function getPosts(req, res, next) {
         const posts = await db.getAllPosts() // default: published = true
 
         res.json({
-            message: "This is get posts",
+            message: "get all posts",
             posts
         })
     } catch (err) {
@@ -36,7 +36,64 @@ async function postPosts(req, res, next) {
 }
 
 
+// Post with Id
+async function getPostsId(req, res, next) {
+    try {
+        const id = req.params.id
+        const post = await db.getPostById(id)
+
+        res.json({
+            message: "get post details",
+            post
+        })
+    } catch (err) {
+        next(err)
+    }
+}
+
+// update
+async function putPostsId(req, res, next) {
+    try {
+        // verify if current user is the post author
+
+
+        // Get info from form body
+        const title = req.body.title
+        const content = req.body.content || null
+        const published = req.body.published || false
+        const authorId = req.user.user.id // req.user is decoded from the JWT
+
+        // update post in db
+        // const newPost = await db.createNewPost(title, content, published, authorId)
+
+        res.status(201).json({
+            message: 'update post',
+            post: newPost
+        })
+    } catch (err) {
+        next(err)
+    }
+}
+
+// delete
+async function deletePostsId(req, res, next) {
+    try {
+        // Delete post in db 
+
+        res.status(201).json({
+            message: 'delete post',
+        })
+    } catch (err) {
+        next(err)
+    }
+}
+
+
 module.exports = {
     getPosts,
-    postPosts
+    postPosts,
+
+    getPostsId,
+    putPostsId,
+    deletePostsId
 }
