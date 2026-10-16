@@ -3,7 +3,11 @@ const prisma = require('../lib/prisma.js')
 
 async function getAllUsers() {
     try {
-        const users = await prisma.user.findMany()
+        const users = await prisma.user.findMany({
+            orderBy: {
+                username: 'desc'
+            }
+        })
         return users
     } catch (error) {
         throw error
@@ -64,7 +68,7 @@ async function getAllPosts(published = true, orderBy = { updatedAt: "desc" }) {
     }
 }
 
-async function getPostById(id) {
+async function getPostById(id, commentOrderBy = { updatedAt: "desc" }) {
     try {
         const post = await prisma.post.findUnique({
             include: {
@@ -85,7 +89,8 @@ async function getPostById(id) {
                                 username: true
                             }
                         }
-                    }
+                    },
+                    orderBy: commentOrderBy
                 }
             },
             where: { id }
@@ -131,6 +136,34 @@ async function deletePost(id) {
     return updatedPost
 }
 
+
+// Comments
+async function createNewComment(content, postId, authorId) {
+    try {
+        const newComment = await prisma.comment.create({
+            data: {
+                content,
+                postId,
+                authorId
+            }
+        })
+
+        return newComment
+    } catch (err) {
+        throw err
+    }
+}
+
+async function updateComment(id, newData) {
+    const updatedComment = await prisma.comment.update({
+        where: { id },
+        data: newData,
+    });
+
+    return updatedComment
+}
+
+
 module.exports = {
     getAllUsers,
     getUserByUsername,
@@ -140,5 +173,8 @@ module.exports = {
     getPostById,
     createNewPost,
     updatePost,
-    deletePost
+    deletePost,
+
+    createNewComment,
+    updateComment
 }

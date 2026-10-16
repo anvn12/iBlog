@@ -12,13 +12,11 @@ app.use(express.urlencoded({ extended: false }))
 const indexRouter = require('./routes/index')
 const authRouter = require('./routes/auth')
 const postsRouter = require('./routes/posts')
-const commentsRouter = require('./routes/comments')
 const usersRouter = require('./routes/users')
 
 app.use('/', indexRouter)
 app.use('/auth', authRouter)
 app.use('/posts', postsRouter)
-app.use('/comments', commentsRouter)
 app.use('/users', usersRouter)
 
 

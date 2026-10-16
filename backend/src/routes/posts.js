@@ -3,6 +3,7 @@ const router = express.Router()
 
 const { authenticateToken } = require('../utils/jwt')
 const postsController = require('../controllers/posts')
+const commentsController = require('../controllers/comments')
 
 
 // /posts 
@@ -16,7 +17,10 @@ router.put('/:id', authenticateToken, postsController.putPostsId)
 router.delete('/:id', authenticateToken, postsController.deletePostsId)
 
 
-// Update & delete comment are in comments route: /comments/:id
+// comments
+router.post('/:postId/comments', authenticateToken, commentsController.postComments)
+router.put('/:postId/comments/:commentId', authenticateToken, commentsController.putComments)
+router.delete('/:postId/comments/:commentId', authenticateToken, commentsController.deleteComments)
 
 
 module.exports = router
