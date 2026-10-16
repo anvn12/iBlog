@@ -16,4 +16,7 @@ router.put('/:id', authenticateToken, postsController.putPostsId)
 router.delete('/:id', authenticateToken, postsController.deletePostsId)
 
 
+// Update & delete comment are in comments route: /comments/:id
+
+
 module.exports = router

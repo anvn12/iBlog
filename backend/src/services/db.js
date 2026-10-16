@@ -1,3 +1,4 @@
+const { AnyNull, AnyNullClass } = require('../../generated/prisma/runtime/client.js')
 const prisma = require('../lib/prisma.js')
 
 async function getAllUsers() {
@@ -113,6 +114,14 @@ async function createNewPost(title, content = null, published = false, authorId)
     }
 }
 
+async function updatePost(id, newData) {
+    const updatedPost = await prisma.post.update({
+        where: { id },
+        data: newData,
+    });
+
+    return updatedPost
+}
 
 module.exports = {
     getAllUsers,
@@ -121,5 +130,6 @@ module.exports = {
 
     getAllPosts,
     getPostById,
-    createNewPost
+    createNewPost,
+    updatePost
 }
