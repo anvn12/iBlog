@@ -1,32 +1,13 @@
 const express = require('express')
 const router = express.Router()
 
-
-router.get('/', (req, res) => {
-    res.json({
-        message: "This is get users"
-    })
-})
+const { authenticateToken } = require('../utils/jwt')
+const usersController = require('../controllers/users')
 
 
 // ID 
-router.get('/:id', (req, res) => {
-    res.json({
-        message: "This is get users id"
-    })
-})
-
-router.put('/:id', (req, res) => {
-    res.json({
-        message: "This is put users id"
-    })
-})
-
-router.delete('/:id', (req, res) => {
-    res.json({
-        message: "This is delete users id"
-    })
-})
+router.get('/:id', authenticateToken, usersController.getUsersId)
+router.put('/:id', authenticateToken, usersController.putUsersId)
 
 
 // User posts

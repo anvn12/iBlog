@@ -1,4 +1,3 @@
-const { AnyNull, AnyNullClass } = require('../../generated/prisma/runtime/client.js')
 const prisma = require('../lib/prisma.js')
 
 async function getAllUsers() {
@@ -18,6 +17,17 @@ async function getUserByUsername(username) {
     try {
         const user = await prisma.user.findUnique({
             where: { username: username }
+        })
+        return user
+    } catch (error) {
+        throw error
+    }
+}
+
+async function getUserById(id) {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id }
         })
         return user
     } catch (error) {
@@ -172,9 +182,19 @@ async function deleteComment(id) {
 }
 
 
+// User 
+async function updateUser(id, newData) {
+    const updatedUser = await prisma.user.update({
+        where: { id },
+        data: newData,
+    });
+    return updatedUser
+}
+
 module.exports = {
     getAllUsers,
     getUserByUsername,
+    getUserById,
     createNewUser,
 
     getAllPosts,
@@ -185,5 +205,7 @@ module.exports = {
 
     createNewComment,
     updateComment,
-    deleteComment
+    deleteComment,
+
+    updateUser
 }
