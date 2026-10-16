@@ -163,6 +163,14 @@ async function updateComment(id, newData) {
     return updatedComment
 }
 
+async function deleteComment(id) {
+    const updatedComment = await prisma.comment.delete({
+        where: { id }
+    });
+
+    return updatedComment
+}
+
 
 module.exports = {
     getAllUsers,
@@ -176,5 +184,6 @@ module.exports = {
     deletePost,
 
     createNewComment,
-    updateComment
+    updateComment,
+    deleteComment
 }

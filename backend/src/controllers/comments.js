@@ -62,28 +62,26 @@ async function putComments(req, res, next) {
 // delete
 async function deleteComments(req, res, next) {
     try {
-        const postId = req.params.id
-        const post = await db.getPostById(postId)
-
         // Post not found -> content not found (404) handler
-        if (!post) {
-            return next()
-        }
+        const postId = req.params.postId
+        const post = await db.getPostById(postId)
+        if (!post) { return next() }
 
-        // verify if current user is the post author
+        // verify if current user is the comment author
         const currentUser = req.user.user
         if (currentUser.id !== post.authorId) {
             return res.status(401).json({
-                error: 'User is not the post author'
+                error: 'User is not the comment author'
             })
         }
 
-        // Delete post in db 
-        const deletedPost = await db.deletePost(postId)
+        // Delete comment in db 
+        const commentId = req.params.commentId
+        const deletedComment = await db.deleteComment(commentId)
 
         res.status(201).json({
             message: 'delete post',
-            post: deletedPost
+            comment: deletedComment
         })
     } catch (err) {
         next(err)
