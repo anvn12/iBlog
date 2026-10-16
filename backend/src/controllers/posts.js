@@ -87,10 +87,23 @@ async function putPostsId(req, res, next) {
 // delete
 async function deletePostsId(req, res, next) {
     try {
+        // verify if current user is the post author
+        const postId = req.params.id
+        const post = await db.getPostById(postId)
+
+        const currentUser = req.user.user
+        if (currentUser.id !== post.authorId) {
+            return res.status(401).json({
+                error: 'User is not the post author'
+            })
+        }
+
         // Delete post in db 
+        const deletedPost = await db.deletePost(postId)
 
         res.status(201).json({
             message: 'delete post',
+            post: deletedPost
         })
     } catch (err) {
         next(err)

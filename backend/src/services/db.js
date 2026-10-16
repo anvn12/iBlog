@@ -123,6 +123,14 @@ async function updatePost(id, newData) {
     return updatedPost
 }
 
+async function deletePost(id) {
+    const updatedPost = await prisma.post.delete({
+        where: { id }
+    });
+
+    return updatedPost
+}
+
 module.exports = {
     getAllUsers,
     getUserByUsername,
@@ -131,5 +139,6 @@ module.exports = {
     getAllPosts,
     getPostById,
     createNewPost,
-    updatePost
+    updatePost,
+    deletePost
 }
