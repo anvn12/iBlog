@@ -11,12 +11,7 @@ router.put('/:id', authenticateToken, usersController.putUsersId)
 
 
 // User posts
-router.get('/:id/posts', (req, res) => {
-    // query: published = true / false
-    res.json({
-        message: "This is get users id"
-    })
-})
+router.get('/:id/posts', authenticateToken, usersController.getUserPosts)
 
 
 module.exports = router

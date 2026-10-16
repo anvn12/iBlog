@@ -112,6 +112,21 @@ async function getPostById(id, commentOrderBy = { updatedAt: "desc" }) {
     }
 }
 
+async function getPostsByUserId(userId, published = true, orderBy = { updatedAt: "desc" }) {
+    try {
+        const posts = await prisma.post.findMany({
+            where: {
+                authorId: userId,
+                published
+            },
+            orderBy
+        })
+        return posts
+    } catch (error) {
+        throw error
+    }
+}
+
 async function createNewPost(title, content = null, published = false, authorId) {
     try {
         const newPost = await prisma.post.create({
@@ -199,6 +214,7 @@ module.exports = {
 
     getAllPosts,
     getPostById,
+    getPostsByUserId,
     createNewPost,
     updatePost,
     deletePost,
