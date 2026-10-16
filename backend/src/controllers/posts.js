@@ -42,6 +42,11 @@ async function getPostsId(req, res, next) {
         const id = req.params.id
         const post = await db.getPostById(id)
 
+        // Post not found -> content not found (404) handler
+        if (!post) {
+            return next()
+        }
+
         res.json({
             message: "get post details",
             post
@@ -54,10 +59,15 @@ async function getPostsId(req, res, next) {
 // update
 async function putPostsId(req, res, next) {
     try {
-        // verify if current user is the post author
         const postId = req.params.id
         const post = await db.getPostById(postId)
 
+        // Post not found -> content not found (404) handler
+        if (!post) {
+            return next()
+        }
+
+        // verify if current user is the post author
         const currentUser = req.user.user
         if (currentUser.id !== post.authorId) {
             return res.status(401).json({
@@ -87,10 +97,15 @@ async function putPostsId(req, res, next) {
 // delete
 async function deletePostsId(req, res, next) {
     try {
-        // verify if current user is the post author
         const postId = req.params.id
         const post = await db.getPostById(postId)
 
+        // Post not found -> content not found (404) handler
+        if (!post) {
+            return next()
+        }
+
+        // verify if current user is the post author
         const currentUser = req.user.user
         if (currentUser.id !== post.authorId) {
             return res.status(401).json({
