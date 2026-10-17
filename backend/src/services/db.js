@@ -3,6 +3,9 @@ const prisma = require('../lib/prisma.js')
 async function getAllUsers() {
     try {
         const users = await prisma.user.findMany({
+            omit: {
+                password: true,
+            },
             orderBy: {
                 username: 'desc'
             }
@@ -16,6 +19,9 @@ async function getAllUsers() {
 async function getUserByUsername(username) {
     try {
         const user = await prisma.user.findUnique({
+            omit: {
+                password: true,
+            },
             where: { username: username }
         })
         return user
@@ -27,6 +33,9 @@ async function getUserByUsername(username) {
 async function getUserById(id) {
     try {
         const user = await prisma.user.findUnique({
+            omit: {
+                password: true,
+            },
             where: { id }
         })
         return user
@@ -42,11 +51,25 @@ async function createNewUser(username, password) {
                 username,
                 password,
             },
+            omit: {
+                password: true,
+            },
         })
         return user
     } catch (error) {
         throw error
     }
+}
+
+async function updateUser(id, newData) {
+    const updatedUser = await prisma.user.update({
+        where: { id },
+        data: newData,
+        omit: {
+            password: true,
+        }
+    });
+    return updatedUser
 }
 
 
@@ -163,6 +186,18 @@ async function deletePost(id) {
 
 
 // Comments
+async function getCommentById(id) {
+    try {
+        const comment = await prisma.comment.findUnique({
+            where: { id }
+        })
+
+        return comment
+    } catch (error) {
+        throw error
+    }
+}
+
 async function createNewComment(content, postId, authorId) {
     try {
         const newComment = await prisma.comment.create({
@@ -197,15 +232,6 @@ async function deleteComment(id) {
 }
 
 
-// User 
-async function updateUser(id, newData) {
-    const updatedUser = await prisma.user.update({
-        where: { id },
-        data: newData,
-    });
-    return updatedUser
-}
-
 module.exports = {
     getAllUsers,
     getUserByUsername,
@@ -219,6 +245,7 @@ module.exports = {
     updatePost,
     deletePost,
 
+    getCommentById,
     createNewComment,
     updateComment,
     deleteComment,

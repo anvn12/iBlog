@@ -1,4 +1,5 @@
 const db = require('../services/db')
+const { body, validationResult } = require('express-validator')
 
 
 // update
@@ -9,8 +10,8 @@ async function getUsersId(req, res, next) {
         const user = await db.getUserById(userId)
         if (!user) { return next() }
 
-        res.status(201).json({
-            message: 'get user details',
+        res.status(200).json({
+            message: 'Get user details',
             user: user
         })
     } catch (err) {
@@ -19,38 +20,58 @@ async function getUsersId(req, res, next) {
 }
 
 // update
-async function putUsersId(req, res, next) {
-    try {
-        // user not found -> content not found (404) handler
-        const userId = req.params.id
-        const user = await db.getUserById(userId)
-        if (!user) { return next() }
+const userUpdateValidator = [
+    body('email')
+        .optional()
+        .isEmail()
+        .withMessage('Must be a valid email')
+        .normalizeEmail(),
 
-        // verify if current user is the User author
-        const currentUser = req.user.user
-        if (currentUser.id !== user.id) {
-            return res.status(401).json({
-                error: 'User is not authorized'
+    body('name')
+        .optional()
+        .trim()
+        .notEmpty()
+        .withMessage('Name cannot be empty')
+]
+const putUsersId = [
+    userUpdateValidator,
+    async (req, res, next) => {
+        try {
+            const errors = validationResult(req)
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() })
+            }
+
+            // user not found -> content not found (404) handler
+            const userId = req.params.id
+            const user = await db.getUserById(userId)
+            if (!user) { return next() }
+
+            // verify if current user is the User author
+            const currentUser = req.user.user
+            if (currentUser.id !== user.id) {
+                return res.status(403).json({
+                    error: 'User is not authorized to update this profile'
+                })
+            }
+
+            const newData = {}
+            if (req.body.name !== undefined) newData.name = req.body.name.trim()
+            if (req.body.email !== undefined) newData.email = req.body.email.trim()
+
+
+            // update User in db
+            const newUser = await db.updateUser(userId, newData)
+
+            res.status(200).json({
+                message: 'Update user information successfully',
+                user: newUser
             })
+        } catch (err) {
+            next(err)
         }
-
-        const newData = {
-            name: req.body.name,
-            email: req.body.email
-        }
-
-        // update User in db
-        const newUser = await db.updateUser(userId, newData)
-
-        res.status(201).json({
-            message: 'update User',
-            user: newUser
-        })
-    } catch (err) {
-        next(err)
     }
-}
-
+]
 
 async function getUserPosts(req, res, next) {
     try {
@@ -64,7 +85,7 @@ async function getUserPosts(req, res, next) {
             // verify if current user is the target user
             const currentUser = req.user.user
             if (currentUser.id !== user.id) {
-                return res.status(401).json({
+                return res.status(403).json({
                     error: 'User is not authorized'
                 })
             }
@@ -73,8 +94,8 @@ async function getUserPosts(req, res, next) {
         // update User in db
         const posts = await db.getPostsByUserId(userId, published)
 
-        res.status(201).json({
-            message: 'user posts',
+        res.status(200).json({
+            message: 'Get user posts successfully',
             posts: posts
         })
     } catch (err) {

@@ -1,4 +1,5 @@
 const db = require('../services/db')
+const { body, validationResult } = require('express-validator')
 
 
 // Posts
@@ -7,7 +8,7 @@ async function getPosts(req, res, next) {
         const posts = await db.getAllPosts() // default: published = true
 
         res.json({
-            message: "get all posts",
+            message: "Get all posts",
             posts
         })
     } catch (err) {
@@ -15,26 +16,39 @@ async function getPosts(req, res, next) {
     }
 }
 
-async function postPosts(req, res, next) {
-    try {
-        // Get info from form body
-        const title = req.body.title
-        const content = req.body.content || null
-        const published = req.body.published || false
-        const authorId = req.user.user.id // req.user is decoded from the JWT
+const postPostsValidator = [
+    body('title')
+        .trim()
+        .notEmpty()
+        .withMessage('Title must not be empty'),
+]
+const postPosts = [
+    postPostsValidator,
+    async (req, res, next) => {
+        try {
+            const errors = validationResult(req)
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() })
+            }
 
-        // Create new post in db 
-        const newPost = await db.createNewPost(title, content, published, authorId)
+            // Get info from form body
+            const title = req.body.title?.trim()
+            const content = req.body.content?.trim() || null
+            const published = req.body.published || false
+            const authorId = req.user.user.id // req.user is decoded from the JWT
 
-        res.status(201).json({
-            message: 'created new post',
-            post: newPost
-        })
-    } catch (err) {
-        next(err)
+            // Create new post in db 
+            const newPost = await db.createNewPost(title, content, published, authorId)
+
+            res.status(201).json({
+                message: 'Created new post successfully',
+                post: newPost
+            })
+        } catch (err) {
+            next(err)
+        }
     }
-}
-
+]
 
 // Post with Id
 async function getPostsId(req, res, next) {
@@ -48,7 +62,7 @@ async function getPostsId(req, res, next) {
         }
 
         res.json({
-            message: "get post details",
+            message: "Get post details",
             post
         })
     } catch (err) {
@@ -57,42 +71,51 @@ async function getPostsId(req, res, next) {
 }
 
 // update
-async function putPostsId(req, res, next) {
-    try {
-        const postId = req.params.id
-        const post = await db.getPostById(postId)
+const putPostsId = [
+    postPostsValidator,
+    async (req, res, next) => {
+        try {
+            const errors = validationResult(req)
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() })
+            }
 
-        // Post not found -> content not found (404) handler
-        if (!post) {
-            return next()
-        }
+            const postId = req.params.id
+            const post = await db.getPostById(postId)
 
-        // verify if current user is the post author
-        const currentUser = req.user.user
-        if (currentUser.id !== post.authorId) {
-            return res.status(401).json({
-                error: 'User is not the post author'
+            // Post not found -> content not found (404) handler
+            if (!post) {
+                return next()
+            }
+
+            // verify if current user is the post author
+            const currentUser = req.user.user
+            if (currentUser.id !== post.authorId) {
+                return res.status(403).json({
+                    error: 'User is not the post author'
+                })
+            }
+
+            // Get info from form body
+            const newData = {
+                title: req.body.title?.trim(),
+                content: req.body.content?.trim() || null,
+                published: (req.body.published === 'true') || false
+            }
+
+            // update post in db
+            const updatedPost = await db.updatePost(postId, newData)
+
+            res.status(200).json({
+                message: 'Updated post sucessfully',
+                post: updatedPost
             })
+        } catch (err) {
+            next(err)
         }
-
-        // Get info from form body
-        const newData = {
-            title: req.body.title,
-            content: req.body.content || null,
-            published: (req.body.published === 'true') || false
-        }
-
-        // update post in db
-        const updatedPost = await db.updatePost(postId, newData)
-
-        res.status(201).json({
-            message: 'update post',
-            post: updatedPost
-        })
-    } catch (err) {
-        next(err)
     }
-}
+]
+
 
 // delete
 async function deletePostsId(req, res, next) {
@@ -108,7 +131,7 @@ async function deletePostsId(req, res, next) {
         // verify if current user is the post author
         const currentUser = req.user.user
         if (currentUser.id !== post.authorId) {
-            return res.status(401).json({
+            return res.status(403).json({
                 error: 'User is not the post author'
             })
         }
@@ -116,8 +139,8 @@ async function deletePostsId(req, res, next) {
         // Delete post in db 
         const deletedPost = await db.deletePost(postId)
 
-        res.status(201).json({
-            message: 'delete post',
+        res.status(200).json({
+            message: 'Deleted post sucessfully',
             post: deletedPost
         })
     } catch (err) {

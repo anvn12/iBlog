@@ -1,63 +1,88 @@
 const db = require('../services/db')
-
+const { body, validationResult } = require('express-validator')
 
 // Add a new comment
-async function postComments(req, res, next) {
-    try {
-        const postId = req.params.postId
+const postCommentsValidator = [
+    body('content')
+        .trim()
+        .notEmpty()
+        .withMessage('Content must not be empty'),
+]
+const postComments = [
+    postCommentsValidator,
+    async (req, res, next) => {
+        try {
+            const errors = validationResult(req)
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() })
+            }
 
-        // Post not found -> content not found (404) handler
-        const post = await db.getPostById(postId)
-        if (!post) { return next() }
+            const postId = req.params.postId
 
-        const content = req.body.content
-        const authorId = req.user.user.id // req.user is decoded from the JWT
+            // Post not found -> content not found (404) handler
+            const post = await db.getPostById(postId)
+            if (!post) { return next() }
 
-        // Create new comment in db 
-        const newComment = await db.createNewComment(content, postId, authorId)
+            const content = req.body.content.trim()
+            const authorId = req.user.user.id // req.user is decoded from the JWT
 
-        res.status(201).json({
-            message: 'created new Comment',
-            comment: newComment
-        })
-    } catch (err) {
-        next(err)
+            // Create new comment in db 
+            const newComment = await db.createNewComment(content, postId, authorId)
+
+            res.status(201).json({
+                message: 'Create new comment sucessfully',
+                comment: newComment
+            })
+        } catch (err) {
+            next(err)
+        }
     }
-}
+]
 
 
 // update
-async function putComments(req, res, next) {
-    try {
-        // Post not found -> content not found (404) handler
-        const postId = req.params.postId
-        const post = await db.getPostById(postId)
-        if (!post) { return next() }
+const putComments = [
+    postCommentsValidator,
+    async (req, res, next) => {
+        try {
+            const errors = validationResult(req)
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() })
+            }
 
-        // verify if current user is the comment author
-        const currentUser = req.user.user
-        if (currentUser.id !== post.authorId) {
-            return res.status(401).json({
-                error: 'User is not the comment author'
+            // Post not found -> content not found (404) handler
+            const postId = req.params.postId
+            const post = await db.getPostById(postId)
+            if (!post) { return next() }
+
+            const commentId = req.params.commentId
+            const comment = await db.getCommentById(commentId)
+            if (!comment) { return next() }
+
+            // verify if current user is the comment author
+            const currentUser = req.user.user
+            if (currentUser.id !== comment.authorId) {
+                return res.status(403).json({
+                    error: 'User is not the comment author'
+                })
+            }
+
+            const newData = {
+                content: req.body.content.trim()
+            }
+
+            // update comment in db
+            const newComment = await db.updateComment(commentId, newData)
+
+            res.status(200).json({
+                message: 'Update comment sucessfully',
+                comment: newComment
             })
+        } catch (err) {
+            next(err)
         }
-
-        const commentId = req.params.commentId
-        const newData = {
-            content: req.body.content
-        }
-
-        // update comment in db
-        const newComment = await db.updateComment(commentId, newData)
-
-        res.status(201).json({
-            message: 'update comment',
-            comment: newComment
-        })
-    } catch (err) {
-        next(err)
     }
-}
+]
 
 // delete
 async function deleteComments(req, res, next) {
@@ -67,20 +92,23 @@ async function deleteComments(req, res, next) {
         const post = await db.getPostById(postId)
         if (!post) { return next() }
 
+        const commentId = req.params.commentId
+        const comment = await db.getCommentById(commentId)
+        if (!comment) { return next() }
+
         // verify if current user is the comment author
         const currentUser = req.user.user
-        if (currentUser.id !== post.authorId) {
-            return res.status(401).json({
+        if (currentUser.id !== comment.authorId) {
+            return res.status(403).json({
                 error: 'User is not the comment author'
             })
         }
 
         // Delete comment in db 
-        const commentId = req.params.commentId
         const deletedComment = await db.deleteComment(commentId)
 
-        res.status(201).json({
-            message: 'delete post',
+        res.status(200).json({
+            message: 'Delete comment sucessfully',
             comment: deletedComment
         })
     } catch (err) {

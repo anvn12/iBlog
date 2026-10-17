@@ -36,7 +36,7 @@ const postLogin = [
             const token = signJWTToken(user)
 
             res.json({
-                message: 'Log in successfully',
+                message: 'Login successfully',
                 token: token
             })
         })(req, res, next)
@@ -91,7 +91,7 @@ const postSignup = [
             const token = signJWTToken(newUser)
 
             res.status(201).json({
-                message: 'Sign up successfully',
+                message: 'Signup successfully',
                 token: token
             })
         } catch (err) {

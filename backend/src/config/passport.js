@@ -2,12 +2,15 @@ const passport = require('passport')
 const LocalStrategy = require('passport-local')
 const bcrypt = require('bcrypt')
 const db = require('../services/db')
+const prisma = require('../lib/prisma.js')
 
 
 // Local strategy for login with username and password
 passport.use(new LocalStrategy(async function verify(username, password, done) {
     try {
-        const user = await db.getUserByUsername(username)
+        const user = await prisma.user.findUnique({
+            where: { username: username }
+        })
 
         // Not found username
         if (!user) { return done(null, false, { message: 'Incorrect username or password.' }) }
