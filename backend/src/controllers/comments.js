@@ -2,14 +2,14 @@ const db = require('../services/db')
 const { body, validationResult } = require('express-validator')
 
 // Add a new comment
-const postCommentsValidator = [
+const createCommentValidator = [
     body('content')
         .trim()
         .notEmpty()
         .withMessage('Content must not be empty'),
 ]
-const postComments = [
-    postCommentsValidator,
+const createComment = [
+    createCommentValidator,
     async (req, res, next) => {
         try {
             const errors = validationResult(req)
@@ -30,7 +30,7 @@ const postComments = [
             const newComment = await db.createNewComment(content, postId, authorId)
 
             res.status(201).json({
-                message: 'Create new comment sucessfully',
+                message: 'Create new comment successfully',
                 comment: newComment
             })
         } catch (err) {
@@ -41,8 +41,8 @@ const postComments = [
 
 
 // update
-const putComments = [
-    postCommentsValidator,
+const updateComment = [
+    createCommentValidator,
     async (req, res, next) => {
         try {
             const errors = validationResult(req)
@@ -75,7 +75,7 @@ const putComments = [
             const newComment = await db.updateComment(commentId, newData)
 
             res.status(200).json({
-                message: 'Update comment sucessfully',
+                message: 'Update comment successfully',
                 comment: newComment
             })
         } catch (err) {
@@ -85,7 +85,7 @@ const putComments = [
 ]
 
 // delete
-async function deleteComments(req, res, next) {
+async function deleteComment(req, res, next) {
     try {
         // Post not found -> content not found (404) handler
         const postId = req.params.postId
@@ -108,7 +108,7 @@ async function deleteComments(req, res, next) {
         const deletedComment = await db.deleteComment(commentId)
 
         res.status(200).json({
-            message: 'Delete comment sucessfully',
+            message: 'Delete comment successfully',
             comment: deletedComment
         })
     } catch (err) {
@@ -118,7 +118,7 @@ async function deleteComments(req, res, next) {
 
 
 module.exports = {
-    postComments,
-    putComments,
-    deleteComments
+    createComment,
+    updateComment,
+    deleteComment
 }

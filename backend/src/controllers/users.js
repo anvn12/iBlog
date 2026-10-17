@@ -3,7 +3,7 @@ const { body, validationResult } = require('express-validator')
 
 
 // update
-async function getUsersId(req, res, next) {
+async function getUserProfile(req, res, next) {
     try {
         // user not found -> content not found (404) handler
         const userId = req.params.id
@@ -33,7 +33,7 @@ const userUpdateValidator = [
         .notEmpty()
         .withMessage('Name cannot be empty')
 ]
-const putUsersId = [
+const updateUserProfile = [
     userUpdateValidator,
     async (req, res, next) => {
         try {
@@ -106,8 +106,8 @@ async function getUserPosts(req, res, next) {
 
 
 module.exports = {
-    getUsersId,
-    putUsersId,
+    getUserProfile,
+    updateUserProfile,
 
     getUserPosts
 }

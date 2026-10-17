@@ -6,8 +6,8 @@ const usersController = require('../controllers/users')
 
 
 // ID 
-router.get('/:id', authenticateToken, usersController.getUsersId)
-router.put('/:id', authenticateToken, usersController.putUsersId)
+router.get('/:id', authenticateToken, usersController.getUserProfile)
+router.put('/:id', authenticateToken, usersController.updateUserProfile)
 
 
 // User posts
