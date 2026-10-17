@@ -1,58 +1,104 @@
+const bcrypt = require('bcrypt')
 const passport = require('../config/passport')
 const db = require('../services/db')
 const { signJWTToken } = require('../utils/jwt')
+const { body, validationResult } = require('express-validator')
 
 
-function postLogin(req, res, next) {
-    passport.authenticate('local', { session: false }, (err, user, info) => {
-        if (err) return next(err)
-        if (!user) {
-            return res.status(401).json({ error: info?.message || 'Authentication failed' })
+// Login
+const loginValidator = [
+    body('username')
+        .trim()
+        .notEmpty()
+        .withMessage('Username is required'),
+
+    body('password')
+        .notEmpty()
+        .withMessage('Password is required'),
+]
+const postLogin = [
+    loginValidator,
+    (req, res, next) => {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() })
         }
 
-        // Log in match -> return token -> client stores it to localStorage
+        passport.authenticate('local', { session: false }, (err, user, info) => {
+            if (err) return next(err)
+            if (!user) {
+                return res.status(401).json({ error: info?.message || 'Authentication failed' })
+            }
 
-        // Sign JWT
-        const token = signJWTToken(user)
+            // Log in match -> return token -> client stores it to localStorage
 
-        res.json({
-            message: 'Log in successful',
-            token: token
-        })
-    })(req, res, next)
-}
+            // Sign JWT
+            const token = signJWTToken(user)
 
-
-async function postSignup(req, res, next) {
-    try {
-        // Get info from form body
-        const username = req.body.username
-        const password = req.body.password
-
-        // check if username exists
-        const existingUser = await db.getUserByUsername(username)
-        if (existingUser) {
-            return res.status(409).json({
-                error: 'Username already exists'
+            res.json({
+                message: 'Log in successfully',
+                token: token
             })
-        }
-
-        // Hash password
-        const saltRounds = 12
-        const hashedPassword = await bcrypt.hash(password, saltRounds)
-
-        // Create new user in db 
-        const newUser = await db.createNewUser(username, hashedPassword)
-        const token = signJWTToken(newUser)
-
-        res.status(201).json({
-            message: 'created new user',
-            token: token
-        })
-    } catch (err) {
-        next(err)
+        })(req, res, next)
     }
-}
+]
+
+
+// Signup
+const signupValidator = [
+    body('username')
+        .trim()
+        .notEmpty()
+        .withMessage('Username is required')
+        .matches(/^[a-zA-Z0-9_]+$/)
+        .withMessage('Username can only contain letters, numbers, and underscores')
+        .custom(async (username) => {
+            const user = await db.getUserByUsername(username.trim())
+            if (user) {
+                throw new Error('Username already exists')
+            }
+        }),
+
+    body('password')
+        .notEmpty()
+        .withMessage('Password is required'),
+
+    body('confirmPassword')
+        .notEmpty()
+        .withMessage('Confirm password is required')
+        .custom((value, { req }) => value === req.body.password)
+        .withMessage('Confirm password must match')
+]
+const postSignup = [
+    signupValidator,
+    async (req, res, next) => {
+        try {
+            const errors = validationResult(req)
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() })
+            }
+
+            // Get info from form body
+            const username = req.body.username.trim()
+            const password = req.body.password
+
+            // Hash password
+            const saltRounds = 12
+            const hashedPassword = await bcrypt.hash(password, saltRounds)
+
+            // Create new user in db 
+            const newUser = await db.createNewUser(username, hashedPassword)
+            const token = signJWTToken(newUser)
+
+            res.status(201).json({
+                message: 'Sign up successfully',
+                token: token
+            })
+        } catch (err) {
+            next(err)
+        }
+    }
+]
 
 
 module.exports = {
