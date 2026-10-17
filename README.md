@@ -1,5 +1,6 @@
 # iBlog
 
+```plaintext
 iBlog/
 ├── frontend/                      # React Frontend (Vite or Create React App)
 │   ├── public/
@@ -34,3 +35,4 @@ iBlog/
 ├── .gitignore
 ├── package.json                 # Root package.json (optional workspace scripts)
 └── README.md
+```
