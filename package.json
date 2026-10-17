@@ -16,8 +16,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "npm run dev:fe && npm run dev:be",
-    "dev:fe": "cd frontend && node --watch src/app.js",
-    "dev:be": "cd backend && node --watch src/app.js",
+    "dev:fe": "cd frontend && npm run dev",
+    "dev:be": "cd backend && npm run dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   }
 }
