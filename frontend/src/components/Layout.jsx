@@ -6,9 +6,6 @@ import AuthContext from "../context/AuthContext";
 function Layout() {
 	const user = useContext(AuthContext);
 
-	console.log('user in logout', user);
-
-
 
 	function logout() {
 		user.removeJWT();
