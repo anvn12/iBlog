@@ -28,7 +28,9 @@ function Layout() {
 				</nav>
 			</header>
 
-			<Outlet />
+			<div id="content">
+				<Outlet />
+			</div>
 
 			<footer>&copy; {new Date().getFullYear()} iBlog. All rights reserved.</footer>
 		</>
