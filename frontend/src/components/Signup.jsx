@@ -70,8 +70,9 @@ function Signup() {
 			} else {
 				setError("Invalid response received from server.");
 			}
-		} catch (error) {
+		} catch (err) {
 			console.error(err);
+			setError("Unable to connect to the server. Please try again later.");
 		}
 	}
 
