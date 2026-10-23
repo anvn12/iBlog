@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import AuthContext from "../context/AuthContext";
 
 const LOGIN_URL = import.meta.env.VITE_SERVER_URL + "/auth/login";
 
@@ -10,6 +11,14 @@ function Login() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
     const [validationErrors, setValidationErrors] = useState([]);
+
+
+    const user = useContext(AuthContext);
+    useEffect(() => {
+        if (user.JWTToken) {
+            navigate("/");
+        }
+    }, [navigate, user.JWTToken]);
 
 
     function handleChangeUsername(event) {
@@ -61,6 +70,7 @@ function Login() {
             setError("Unable to connect to the server. Please try again.");
         }
     }
+
 
     return (
         <>

@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router";
-
+import AuthContext from "../context/AuthContext";
 
 const SIGNUP_URL = import.meta.env.VITE_SERVER_URL + "/auth/signup";
 
@@ -13,6 +13,14 @@ function Signup() {
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [error, setError] = useState(null);
 	const [validationErrors, setValidationErrors] = useState([]);
+
+
+	const user = useContext(AuthContext);
+	useEffect(() => {
+		if (user.JWTToken) {
+			navigate("/");
+		}
+	}, [navigate, user.JWTToken]);
 
 
 	function handleChangeUsername(event) {
