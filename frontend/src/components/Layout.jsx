@@ -10,6 +10,7 @@ function Layout() {
           <NavLink to="/">iBlog</NavLink>
           <NavLink to="/login">Log in</NavLink>
           <NavLink to="/signup">Sign up</NavLink>
+          <NavLink to="/logout">Log out</NavLink>
         </nav>
       </header>
 

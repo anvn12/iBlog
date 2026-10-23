@@ -1,112 +1,120 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
+const LOGIN_URL = import.meta.env.VITE_SERVER_URL + "/auth/login";
+
 function Login() {
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
-  const [validationErrors, setValidationErrors] = useState([]);
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState(null);
+    const [validationErrors, setValidationErrors] = useState([]);
 
-  function handleChangeUsername(event) {
-    setUsername(event.target.value);
-  }
-  function handleChangePassword(event) {
-    setPassword(event.target.value);
-  }
 
-  const loginURL = import.meta.env.VITE_SERVER_URL + "/auth/login";
-  function sendLoginForm() {
-    fetch(loginURL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: username,
-        password: password,
-      }),
-    })
-      .then((res) => res.json())
-      .then((result) => {
-        if (result.error) {
-          setError(result.error);
-        } else if (result.errors) {
-          setValidationErrors(result.errors);
-        } else {
-          localStorage.setItem("JWT token", result.token);
+    function handleChangeUsername(event) {
+        setUsername(event.target.value);
+    }
+    function handleChangePassword(event) {
+        setPassword(event.target.value);
+    }
 
-          navigate("/");
+
+    async function handleSubmit(event) {
+        event.preventDefault();
+        setError(null);
+        setValidationErrors([]);
+
+        try {
+            const res = await fetch(LOGIN_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username: username.trim(),
+                    password: password,
+                }),
+            });
+
+            const result = await res.json();
+
+            if (!res.ok) {
+                if (result.errors) {
+                    setValidationErrors(result.errors);
+                } else {
+                    setError(
+                        result.error || result.message || "Failed to log in.",
+                    );
+                }
+                return;
+            }
+
+            if (result.token) {
+                localStorage.setItem("JWT token", result.token);
+                navigate("/");
+            } else {
+                setError("Invalid response received from server.");
+            }
+        } catch (err) {
+            console.error(err);
+            setError("Unable to connect to the server. Please try again.");
         }
-      })
+    }
 
-      .catch((err) => {
-        console.error(err);
-      });
-  }
+    return (
+        <>
+            <h1>Login</h1>
 
-  function handleSubmit(event) {
-    event.preventDefault();
-    setError(null);
-    setValidationErrors([]);
+            <main>
+                <form onSubmit={handleSubmit}>
+                    {error && (
+                        <section>
+                            <p>{error}</p>
+                        </section>
+                    )}
 
-    sendLoginForm();
-  }
+                    <section>
+                        {validationErrors
+                            .filter((error) => error.path === "username")
+                            .map((error, i) => {
+                                return <p key={i}>{error.msg}</p>;
+                            })}
 
-  return (
-    <>
-      <h1>Login</h1>
+                        <label htmlFor="username">Username*</label>
+                        <input
+                            type="text"
+                            name="username"
+                            id="username"
+                            value={username}
+                            onChange={handleChangeUsername}
+                            placeholder="Username"
+                        />
+                    </section>
 
-      <main>
-        <form onSubmit={handleSubmit}>
-          {error && (
-            <section>
-              <p>{error}</p>
-            </section>
-          )}
+                    <section>
+                        {validationErrors
+                            .filter((error) => error.path === "password")
+                            .map((error, i) => {
+                                return <p key={i}>{error.msg}</p>;
+                            })}
 
-          <section>
-            {validationErrors
-              .filter((error) => error.path === "username")
-              .map((error, i) => {
-                return <p key={i}>{error.msg}</p>;
-              })}
+                        <label htmlFor="password">Password*</label>
+                        <input
+                            type="password"
+                            name="password"
+                            id="password"
+                            value={password}
+                            onChange={handleChangePassword}
+                            placeholder="Password"
+                        />
+                    </section>
 
-            <label htmlFor="username">Username*</label>
-            <input
-              type="text"
-              name="username"
-              id="username"
-              value={username}
-              onChange={handleChangeUsername}
-              placeholder="Username"
-            />
-          </section>
-
-          <section>
-            {validationErrors
-              .filter((error) => error.path === "password")
-              .map((error, i) => {
-                return <p key={i}>{error.msg}</p>;
-              })}
-
-            <label htmlFor="password">Password*</label>
-            <input
-              type="password"
-              name="password"
-              id="password"
-              value={password}
-              onChange={handleChangePassword}
-              placeholder="Password"
-            />
-          </section>
-
-          <button type="submit">Log in</button>
-        </form>
-      </main>
-    </>
-  );
+                    <button type="submit">Log in</button>
+                </form>
+            </main>
+        </>
+    );
 }
 
 export default Login;

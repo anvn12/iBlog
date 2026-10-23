@@ -3,6 +3,7 @@ import Layout from "./components/Layout";
 import Home from "./components/Home";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
+import Logout from "./components/Logout";
 
 let router = createBrowserRouter([
   {
@@ -20,6 +21,10 @@ let router = createBrowserRouter([
   {
     path: "signup",
     Component: Signup,
+  },
+  {
+    path: "logout",
+    Component: Logout,
   },
 ]);
 
