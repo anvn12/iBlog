@@ -1,14 +1,15 @@
-// import { useState } from 'react'
+import { useContext } from "react";
+import AuthContext from "../context/AuthContext";
 
 function Home() {
-  const token = localStorage.getItem("JWT token") || null;
-  // let isAuth = token ? true : false;
+  const user = useContext(AuthContext);
+
 
   return (
     <div>
       <h1>Home</h1>
 
-      <p>Is auth: {token}</p>
+      <p>JWT: {user.JWT || "None"}</p>
     </div>
   );
 }

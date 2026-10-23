@@ -1,30 +1,39 @@
-import { NavLink } from "react-router";
-import { Outlet } from "react-router";
-
+import { NavLink, Outlet } from "react-router";
 import { useContext } from "react";
+
 import AuthContext from "../context/AuthContext";
 
 function Layout() {
-
 	const user = useContext(AuthContext);
-	console.log('user', user);
+
+	console.log('user in logout', user);
 
 
-	const yearNow = new Date().getFullYear();
+
+	function logout() {
+		user.removeJWT();
+	}
+
+
 	return (
 		<>
 			<header>
 				<nav>
 					<NavLink to="/">iBlog</NavLink>
-					<NavLink to="/login">Log in</NavLink>
-					<NavLink to="/signup">Sign up</NavLink>
-					<NavLink to="/logout">Log out</NavLink>
+					{user.JWT ? (
+						<button onClick={logout}>Log out</button>
+					) : (
+						<>
+							<NavLink to="/login">Log in</NavLink>
+							<NavLink to="/signup">Sign up</NavLink>
+						</>
+					)}
 				</nav>
 			</header>
 
 			<Outlet />
 
-			<footer>&copy; {yearNow} iBlog. All rights reserved.</footer>
+			<footer>&copy; {new Date().getFullYear()} iBlog. All rights reserved.</footer>
 		</>
 	);
 }

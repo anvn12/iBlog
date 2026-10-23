@@ -73,7 +73,7 @@ function Signup() {
 			}
 
 			if (result.token) {
-				localStorage.setItem("JWT token", result.token);
+				user.changeJWT(result.token);
 				navigate("/");
 			} else {
 				setError("Invalid response received from server.");
@@ -114,6 +114,7 @@ function Signup() {
 							name="username"
 							id="username"
 							value={username}
+							autoFocus
 							onChange={handleChangeUsername}
 							placeholder="Username"
 						/>

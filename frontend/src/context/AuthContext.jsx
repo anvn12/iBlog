@@ -5,15 +5,25 @@ const AuthContext = createContext(null);
 
 // Provide Context
 function AuthProvider({ children }) {
-    const [JWTToken, setJWTToken] = useState(localStorage.getItem("JWT token"));
+    const [JWT, setJWT] = useState(localStorage.getItem("JWT"));
 
     function changeJWT(value) {
-        localStorage.setItem("JWT token", value);
-        setJWTToken(value);
+        if (value === null) {
+            removeJWT();
+            return;
+        }
+
+        localStorage.setItem("JWT", value);
+        setJWT(value);
+    }
+
+    function removeJWT() {
+        localStorage.removeItem("JWT");
+        setJWT(null);
     }
 
     return (
-        <AuthContext.Provider value={{ JWTToken, changeJWT }}>
+        <AuthContext.Provider value={{ JWT, changeJWT, removeJWT }}>
             {children}
         </AuthContext.Provider>
     )
