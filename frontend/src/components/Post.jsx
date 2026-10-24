@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { useParams, Link } from "react-router";
+import { useParams, Link, useNavigate } from "react-router";
 import AuthContext from "../context/AuthContext";
 
 
@@ -8,6 +8,8 @@ const POSTS_URL = import.meta.env.VITE_SERVER_URL + "/posts";
 
 
 function Post() {
+    const navigate = useNavigate();
+
     const [reloadPost, setReloadPost] = useState(false); // change this var to reload the post (and the comments)
 
     const [post, setPost] = useState(null);
@@ -32,6 +34,34 @@ function Post() {
 
         fetchPost();
     }, [postId, reloadPost]);
+
+
+    async function deletePost() {
+        const TARGET_URL = `${POSTS_URL}/${postId}`;
+
+        try {
+            const res = await fetch(TARGET_URL, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${user.JWT}`
+                },
+                body: JSON.stringify({}),
+            });
+
+            const result = await res.json();
+
+            if (!res.ok) {
+                setError(result.error || result.message || "Failed to delete post.");
+                return;
+            }
+
+            navigate('/');
+        } catch (err) {
+            console.error(err);
+            setError("Unable to connect to the server. Please try again later.");
+        }
+    }
 
 
     // Comment
@@ -114,13 +144,20 @@ function Post() {
 
     return (
         <main className="container">
-            <h1>{post.title && post.title}</h1>
+            <div>
+                <h1>{post.title && post.title}</h1>
 
-            <p>{post.author && "Author: " + post.author.username}</p>
-            {/* <p>{post.createdAt && "createdAt: " + (new Date(post.createdAt).toLocaleDateString())}</p> */}
-            {/* <p>{post.updatedAt && "updatedAt: " + (new Date(post.updatedAt).toLocaleDateString())}</p> */}
+                <p>{post.author && "Author: " + post.author.username}</p>
+                {/* <p>{post.createdAt && "createdAt: " + (new Date(post.createdAt).toLocaleDateString())}</p> */}
+                {/* <p>{post.updatedAt && "updatedAt: " + (new Date(post.updatedAt).toLocaleDateString())}</p> */}
 
-            <p>{post.content && "content: " + post.content}</p>
+                <p>{post.content && "content: " + post.content}</p>
+
+                {
+                    (user.profile && post.author.id === user.profile.id) &&
+                    <button onClick={() => deletePost()}>Remove Post</button>
+                }
+            </div>
 
             <div>
                 <h2>Comments</h2>
