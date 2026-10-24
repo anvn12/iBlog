@@ -251,9 +251,6 @@ a:hover {
 
 .posts-grid .post-meta {
 	color: #64748b;
-	display: flex;
-	flex: 1;
-	gap: 5px;
 }
 
 .posts-grid .post-footer {

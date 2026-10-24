@@ -46,8 +46,11 @@ function Home() {
 									<span>
 										By <Link to={"/users/" + post.author.id}>{post.author.username}</Link>
 									</span>
+
+									,&nbsp;
+
 									<span>
-										on {new Date(post.updatedAt).toLocaleDateString()}
+										{new Date(post.updatedAt).toLocaleDateString()}
 									</span>
 								</p>
 							</div>

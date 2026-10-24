@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { useParams } from "react-router";
+import { useParams, Link } from "react-router";
 import AuthContext from "../context/AuthContext";
 
 
@@ -77,6 +77,36 @@ function Post() {
         }
     }
 
+    async function deleteComment(commentId) {
+        setError(null);
+
+        const TARGET_URL = `${POSTS_URL}/${postId}/comments/${commentId}`;
+
+        try {
+            const res = await fetch(TARGET_URL, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${user.JWT}`
+                },
+                body: JSON.stringify({}),
+            });
+
+            const result = await res.json();
+
+
+            if (!res.ok) {
+                setError(result.error || result.message || "Failed to delete comment.");
+                return;
+            }
+
+            setReloadPost(!reloadPost);
+        } catch (err) {
+            console.error(err);
+            setError("Unable to connect to the server. Please try again later.");
+        }
+    }
+
 
     if (!post) {
         return <></>
@@ -116,16 +146,34 @@ function Post() {
                 {post.comments && post.comments.map(comment => {
                     return (
                         <div key={comment.id}>
-                            {/* <p>id: {comment.id}</p> */}
-                            <p>author.username: {comment.author.username}</p>
-                            {/* <p>updatedAt {(new Date(comment.updatedAt).toLocaleDateString())}</p> */}
-                            <p>content: {comment.content}</p>
+                            <p>
+                                <span>
+                                    <Link to={"/users/" + comment.author.id}>{comment.author.username}</Link>
+                                </span>
+
+                                ,&nbsp;
+
+                                <span>
+                                    {(new Date(comment.updatedAt).toLocaleDateString())}
+                                </span>
+                            </p>
+
+                            <p>{comment.content}</p>
+
+                            {/* {(user.profile && comment.author.id === user.profile.id) &&
+                                <button onClick={() => editComment(comment.id)}>Edit</button>
+                            } */}
+
+                            {
+                                (user.profile && comment.author.id === user.profile.id) &&
+                                <button onClick={() => deleteComment(comment.id)}>Remove</button>
+                            }
                         </div>
                     )
                 })}
             </div>
 
-        </main>
+        </main >
     );
 }
 
