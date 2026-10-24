@@ -126,7 +126,7 @@ function Post() {
                 <h2>Comments</h2>
 
                 <div>
-                    {user.profile ?
+                    {user.profile ? (
                         <form onSubmit={postNewComment}>
                             {error && (
                                 <div className="form-group">
@@ -137,8 +137,9 @@ function Post() {
                             <input type="text" name="content" value={commentContent} onChange={handleChangeCommentContent} placeholder="Comment" />
                             <button type="submit">Post</button>
                         </form>
-                        :
+                    ) : (
                         <p>Log in or sign up to comment</p>
+                    )
                     }
                 </div>
 
