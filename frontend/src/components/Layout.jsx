@@ -14,25 +14,37 @@ function Layout() {
 
 	return (
 		<>
-			<header>
-				<nav>
-					<NavLink to="/">iBlog</NavLink>
-					{user.JWT ? (
-						<button onClick={logout}>Log out</button>
-					) : (
-						<>
-							<NavLink to="/login">Log in</NavLink>
-							<NavLink to="/signup">Sign up</NavLink>
-						</>
-					)}
-				</nav>
+			<header className="navbar">
+				<div className="container">
+					<NavLink to="/" className="navbar-brand">iBlog</NavLink>
+
+
+					<nav>
+						<ul className="navbar-nav">
+							<li>
+								{user.profile && user.profile.username}
+							</li>
+
+							{user.JWT ? (
+								<li><button className="btn btn-secondary btn-sm" onClick={logout}>Log out</button></li>
+							) : (
+								<>
+									<li><NavLink to="/login">Log in</NavLink></li>
+									<li><NavLink to="/signup">Sign up</NavLink></li>
+								</>
+							)}
+						</ul>
+					</nav>
+				</div>
 			</header>
 
 			<div id="content">
 				<Outlet />
 			</div>
 
-			<footer>&copy; {new Date().getFullYear()} iBlog. All rights reserved.</footer>
+			<footer className="text-center text-muted" style={{ padding: '24px' }}>
+				&copy; {new Date().getFullYear()} iBlog. All rights reserved.
+			</footer>
 		</>
 	);
 }

@@ -95,61 +95,69 @@ function Signup() {
 	}
 
 	return (
-		<>
-			<h1>Sign up</h1>
+		<main className="container">
+			<div className="page-header">
+				<h1>Create Account</h1>
+				<p>Join our community today</p>
+			</div>
 
-			<main>
-				<form onSubmit={handleSubmit}>
-					{error && (
-						<section>
-							<p>{error}</p>
-						</section>
-					)}
+			<div className="card" style={{ maxWidth: '480px', margin: '0 auto' }}>
+				<div className="card-body">
+					<form onSubmit={handleSubmit}>
+						{error && (
+							<div className="form-group">
+								<p style={{ color: '#ef4444' }}>{error}</p>
+							</div>
+						)}
 
-					<section>
-						{getFieldError("username")}
-						<label htmlFor="username">Username*</label>
-						<input
-							type="text"
-							name="username"
-							id="username"
-							value={username}
-							autoFocus
-							onChange={handleChangeUsername}
-							placeholder="Username"
-						/>
-					</section>
+						<div className="form-group">
+							{getFieldError("username")}
+							<label className="form-label" htmlFor="username">Username</label>
+							<input
+								type="text"
+								name="username"
+								id="username"
+								className="form-input"
+								value={username}
+								autoFocus
+								onChange={handleChangeUsername}
+								placeholder="Choose a username"
+							/>
+						</div>
 
-					<section>
-						{getFieldError("password")}
-						<label htmlFor="password">Password*</label>
-						<input
-							type="password"
-							name="password"
-							id="password"
-							value={password}
-							onChange={handleChangePassword}
-							placeholder="Password"
-						/>
-					</section>
+						<div className="form-group">
+							{getFieldError("password")}
+							<label className="form-label" htmlFor="password">Password</label>
+							<input
+								type="password"
+								name="password"
+								id="password"
+								className="form-input"
+								value={password}
+								onChange={handleChangePassword}
+								placeholder="Create a password"
+							/>
+						</div>
 
-					<section>
-						{getFieldError("confirmPassword")}
-						<label htmlFor="confirmPassword">Confirm Password*</label>
-						<input
-							type="password"
-							name="confirmPassword"
-							id="confirmPassword"
-							value={confirmPassword}
-							onChange={handleChangeConfirmPassword}
-							placeholder="Confirm Password"
-						/>
-					</section>
+						<div className="form-group">
+							{getFieldError("confirmPassword")}
+							<label className="form-label" htmlFor="confirmPassword">Confirm Password</label>
+							<input
+								type="password"
+								name="confirmPassword"
+								id="confirmPassword"
+								className="form-input"
+								value={confirmPassword}
+								onChange={handleChangeConfirmPassword}
+								placeholder="Confirm your password"
+							/>
+						</div>
 
-					<button type="submit">Sign up</button>
-				</form>
-			</main>
-		</>
+						<button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Sign up</button>
+					</form>
+				</div>
+			</div>
+		</main>
 	);
 }
 

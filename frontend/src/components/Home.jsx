@@ -28,34 +28,34 @@ function Home() {
 
 
 	return (
-		<>
-			<h1>Home</h1>
+		<main className="container">
+			<div className="page-header">
+				<h1>Latest Posts</h1>
+				<p>Discover stories from our community</p>
+			</div>
 
-			<main>
-				<div className="posts-container">
-					{posts.map(post => {
-						return (
-							<Link to={"/posts/" + post.id}>
-
-								<div className="post" key={post.id}>
-									<p>
-										Title: {post.title}
-									</p>
-
-									<p>
-										<Link to={"/users/" + post.author.id}>
-											Author: {post.author.username}
-										</Link>
-									</p>
-
-									<p>Updated At: {post.updatedAt}</p>
-								</div>
-							</Link>
-						)
-					})}
-				</div>
-			</main>
-		</>
+			<div className="posts-grid">
+				{posts.map(post => {
+					return (
+						<article className="card" key={post.id}>
+							<div className="card-body">
+								<h2 className="post-title">
+									<Link to={"/posts/" + post.id}>{post.title}</Link>
+								</h2>
+								<p className="post-meta">
+									<span>
+										By <Link to={"/users/" + post.author.id}>{post.author.username}</Link>
+									</span>
+									<span>
+										on {new Date(post.updatedAt).toLocaleDateString()}
+									</span>
+								</p>
+							</div>
+						</article>
+					)
+				})}
+			</div>
+		</main>
 	);
 }
 

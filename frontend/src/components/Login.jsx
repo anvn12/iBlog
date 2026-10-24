@@ -73,58 +73,63 @@ function Login() {
 
 
     return (
-        <>
-            <h1>Login</h1>
+        <main className="container">
+            <div className="page-header">
+                <h1>Welcome Back</h1>
+                <p>Sign in to your account</p>
+            </div>
 
-            <main>
-                <form onSubmit={handleSubmit}>
-                    {error && (
-                        <section>
-                            <p>{error}</p>
-                        </section>
-                    )}
+            <div className="card" style={{ maxWidth: '480px', margin: '0 auto' }}>
+                <div className="card-body">
+                    <form onSubmit={handleSubmit}>
+                        {error && (
+                            <div className="form-group">
+                                <p className="text-muted" style={{ color: '#ef4444' }}>{error}</p>
+                            </div>
+                        )}
 
-                    <section>
-                        {validationErrors
-                            .filter((error) => error.path === "username")
-                            .map((error, i) => {
-                                return <p key={i}>{error.msg}</p>;
-                            })}
+                        <div className="form-group">
+                            {validationErrors
+                                .filter((error) => error.path === "username")
+                                .map((error, i) => {
+                                    return <p key={i} style={{ color: '#ef4444' }}>{error.msg}</p>;
+                                })}
+                            <label className="form-label" htmlFor="username">Username</label>
+                            <input
+                                type="text"
+                                name="username"
+                                id="username"
+                                className="form-input"
+                                value={username}
+                                autoFocus
+                                onChange={handleChangeUsername}
+                                placeholder="Enter your username"
+                            />
+                        </div>
 
-                        <label htmlFor="username">Username*</label>
-                        <input
-                            type="text"
-                            name="username"
-                            id="username"
-                            value={username}
-                            autoFocus
-                            onChange={handleChangeUsername}
-                            placeholder="Username"
-                        />
-                    </section>
+                        <div className="form-group">
+                            {validationErrors
+                                .filter((error) => error.path === "password")
+                                .map((error, i) => {
+                                    return <p key={i} style={{ color: '#ef4444' }}>{error.msg}</p>;
+                                })}
+                            <label className="form-label" htmlFor="password">Password</label>
+                            <input
+                                type="password"
+                                name="password"
+                                id="password"
+                                className="form-input"
+                                value={password}
+                                onChange={handleChangePassword}
+                                placeholder="Enter your password"
+                            />
+                        </div>
 
-                    <section>
-                        {validationErrors
-                            .filter((error) => error.path === "password")
-                            .map((error, i) => {
-                                return <p key={i}>{error.msg}</p>;
-                            })}
-
-                        <label htmlFor="password">Password*</label>
-                        <input
-                            type="password"
-                            name="password"
-                            id="password"
-                            value={password}
-                            onChange={handleChangePassword}
-                            placeholder="Password"
-                        />
-                    </section>
-
-                    <button type="submit">Log in</button>
-                </form>
-            </main>
-        </>
+                        <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Log in</button>
+                    </form>
+                </div>
+            </div>
+        </main>
     );
 }
 
