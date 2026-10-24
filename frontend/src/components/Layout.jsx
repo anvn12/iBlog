@@ -21,9 +21,11 @@ function Layout() {
 
 					<nav>
 						<ul className="navbar-nav">
-							<li>
-								{user.profile && user.profile.username}
-							</li>
+							{user.profile &&
+								<li>
+									<NavLink to={"/users/" + user.profile.id}>{user.profile.username}</NavLink>
+								</li>
+							}
 
 							{user.JWT ? (
 								<li><button className="btn btn-secondary btn-sm" onClick={logout}>Log out</button></li>

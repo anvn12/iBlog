@@ -10,7 +10,7 @@ router.get('/me', usersController.getUserFromJWT)
 
 
 // ID 
-router.get('/:id', authenticateToken, usersController.getUserProfile)
+router.get('/:id', usersController.getUserProfile)
 router.put('/:id', authenticateToken, usersController.updateUserProfile)
 
 

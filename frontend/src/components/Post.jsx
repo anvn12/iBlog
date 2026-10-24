@@ -22,7 +22,7 @@ function Post() {
                 const res = await fetch(`${POSTS_URL}/${postId}`);
                 const result = await res.json();
 
-                console.log('fetch post result', result);
+                // console.log('fetch post result', result);
 
                 setPost(result.post);
             } catch (err) {
