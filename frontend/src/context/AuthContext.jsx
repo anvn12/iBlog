@@ -50,6 +50,7 @@ function AuthProvider({ children }) {
     function removeJWT() {
         localStorage.removeItem("JWT");
         setJWT(null);
+        setProfile(null);
     }
 
     return (
