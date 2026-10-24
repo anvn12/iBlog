@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import AuthContext from "../context/AuthContext";
 
 const SIGNUP_URL = import.meta.env.VITE_SERVER_URL + "/auth/signup";
@@ -155,6 +155,11 @@ function Signup() {
 
 						<button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Sign up</button>
 					</form>
+				</div>
+				<div>
+					<span>Already has an account?</span>
+					&nbsp;
+					<Link to="/login">Log in</Link>
 				</div>
 			</div>
 		</main>

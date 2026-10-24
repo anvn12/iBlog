@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import AuthContext from "../context/AuthContext";
 
 const LOGIN_URL = import.meta.env.VITE_SERVER_URL + "/auth/login";
@@ -127,6 +127,11 @@ function Login() {
 
                         <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Log in</button>
                     </form>
+                </div>
+                <div>
+                    <span>Or create a new account?</span>
+                    &nbsp;
+                    <Link to="/signup">Sign up</Link>
                 </div>
             </div>
         </main>

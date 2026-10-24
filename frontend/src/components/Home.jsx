@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useContext } from "react";
 import AuthContext from "../context/AuthContext";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Editor } from '@tinymce/tinymce-react';
 import Modal from 'react-modal';
 Modal.setAppElement('#root');
@@ -23,6 +23,8 @@ const customStyles = {
 
 
 function Home() {
+	const navigate = useNavigate();
+
 	const user = useContext(AuthContext);
 
 	const [reloadPost, setReloadPost] = useState(false); // change this var to reload the post (and the comments)
@@ -47,10 +49,22 @@ function Home() {
 
 	// New post
 	const [modalIsOpen, setIsOpen] = useState(false);
+	const [error, setError] = useState(null);
+	const [validationErrors, setValidationErrors] = useState([]);
+
 	function openModal() {
+		setError(null);
+		setValidationErrors([]);
+
+		if (!user?.JWT) {
+			navigate('/login');
+			return;
+		}
 		setIsOpen(true);
 	}
 	function closeModal() {
+		setError(null);
+		setValidationErrors([]);
 		setIsOpen(false);
 	}
 
@@ -67,10 +81,13 @@ function Home() {
 	};
 
 	async function createNewPost() {
+		setError(null);
+		setValidationErrors([]);
+
 		const content = editorRef.current ? editorRef.current.getContent() : "";
 
 		try {
-			await fetch(POSTS_URL, {
+			const res = await fetch(POSTS_URL, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -82,6 +99,17 @@ function Home() {
 					published
 				}),
 			});
+
+			const result = await res.json();
+
+			if (!res.ok) {
+				if (result.errors) {
+					setValidationErrors(result.errors);
+				} else {
+					setError(result.error || result.message || "Failed to create new post.");
+				}
+				return;
+			}
 
 			setPostTitle("");
 			setPublished(true);
@@ -129,8 +157,6 @@ function Home() {
 			</div>
 
 			<div>
-				{console.log('published', published)}
-
 				<Modal
 					isOpen={modalIsOpen}
 					onRequestClose={closeModal}
