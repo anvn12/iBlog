@@ -174,7 +174,7 @@ function Home() {
 						<Editor
 							apiKey={TINYMCE_API}
 							onInit={(evt, editor) => editorRef.current = editor}
-							initialValue="<p>This is the initial content of the editor.</p>"
+							initialValue=""
 							init={{
 								height: 300,
 								menubar: false,
@@ -187,12 +187,14 @@ function Home() {
 									'bold italic forecolor | alignleft aligncenter ' +
 									'alignright alignjustify | bullist numlist outdent indent | ' +
 									'removeformat | help',
-								content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+								content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+								branding: false,
+								placeholder: 'Content'
 							}}
 						/>
 
 						<div>
-							<label htmlFor="published">Published: </label>
+							<label htmlFor="published">Is published: </label>
 							<select name="published" id="published" onChange={changeSelectOptionHandler}>
 								<option value="true">True</option>
 								<option value="false">False</option>

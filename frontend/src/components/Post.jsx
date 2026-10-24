@@ -1,6 +1,8 @@
 import { useState, useEffect, useContext } from "react";
 import { useParams, Link, useNavigate } from "react-router";
 import AuthContext from "../context/AuthContext";
+import parse from 'html-react-parser';
+import DOMPurify from 'dompurify';
 
 
 const POSTS_URL = import.meta.env.VITE_SERVER_URL + "/posts";
@@ -151,7 +153,8 @@ function Post() {
                 {/* <p>{post.createdAt && "createdAt: " + (new Date(post.createdAt).toLocaleDateString())}</p> */}
                 {/* <p>{post.updatedAt && "updatedAt: " + (new Date(post.updatedAt).toLocaleDateString())}</p> */}
 
-                <p>{post.content && "content: " + post.content}</p>
+                {/* <p>{post.content && "content: " + post.content}</p> */}
+                {post.content && <div className="post-content">{parse(DOMPurify.sanitize(post.content))}</div>}
 
                 {
                     (user.profile && post.author.id === user.profile.id) &&

@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@tinymce/tinymce-react": "^6.3.1",
+    "dompurify": "^3.4.17",
     "dotenv": "^18.0.8",
+    "html-react-parser": "^6.1.9",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-modal": "^3.16.3",
