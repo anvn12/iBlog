@@ -1,36 +1,22 @@
-import { useState, useEffect, useRef, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import AuthContext from "../context/AuthContext";
 import { Link, useNavigate } from "react-router";
-import { Editor } from '@tinymce/tinymce-react';
-import Modal from 'react-modal';
-Modal.setAppElement('#root');
+
+import PostModal from "./PostModal";
+
 
 
 const POSTS_URL = import.meta.env.VITE_SERVER_URL + "/posts";
-const TINYMCE_API = import.meta.env.VITE_TINYMCE_API;
-
-
-const customStyles = {
-	content: {
-		top: '50%',
-		left: '50%',
-		right: 'auto',
-		bottom: 'auto',
-		marginRight: '-50%',
-		transform: 'translate(-50%, -50%)',
-	},
-};
-
 
 function Home() {
-	const navigate = useNavigate();
-
 	const user = useContext(AuthContext);
 
+	const navigate = useNavigate();
+
+
+	// fetch posts
 	const [reloadPost, setReloadPost] = useState(false); // change this var to reload the post (and the comments)
-
 	const [posts, setPosts] = useState([]);
-
 	useEffect(() => {
 		async function fetchPost() {
 			try {
@@ -47,44 +33,26 @@ function Home() {
 	}, [reloadPost]);
 
 
-	// New post
-	const [modalIsOpen, setIsOpen] = useState(false);
-	const [error, setError] = useState(null);
+	// New post modal
 	const [validationErrors, setValidationErrors] = useState([]);
+	const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+	const [postTitle, setPostTitle] = useState("");
+	const [postContent, setPostContent] = useState("");
+	const [published, setPublished] = useState(true);
 
-	function openModal() {
-		setError(null);
+	function openNewPostModal() {
 		setValidationErrors([]);
 
 		if (!user?.JWT) {
 			navigate('/login');
 			return;
 		}
-		setIsOpen(true);
-	}
-	function closeModal() {
-		setError(null);
-		setValidationErrors([]);
-		setIsOpen(false);
-	}
 
-	const [postTitle, setPostTitle] = useState("");
-	function handleChangePostTitle(event) {
-		setPostTitle(event.target.value);
+		setIsPostModalOpen(true);
 	}
-
-	const editorRef = useRef(null);
-
-	const [published, setPublished] = useState(true);
-	const changeSelectOptionHandler = (event) => {
-		setPublished(event.target.value);
-	};
 
 	async function createNewPost() {
-		setError(null);
 		setValidationErrors([]);
-
-		const content = editorRef.current ? editorRef.current.getContent() : "";
 
 		try {
 			const res = await fetch(POSTS_URL, {
@@ -95,7 +63,7 @@ function Home() {
 				},
 				body: JSON.stringify({
 					title: postTitle.trim(),
-					content: content.trim(),
+					content: postContent.trim() || "",
 					published
 				}),
 			});
@@ -105,17 +73,19 @@ function Home() {
 			if (!res.ok) {
 				if (result.errors) {
 					setValidationErrors(result.errors);
-				} else {
-					setError(result.error || result.message || "Failed to create new post.");
 				}
 				return;
 			}
 
 			setPostTitle("");
+			setPostContent("");
 			setPublished(true);
-			editorRef.current.setContent('')
-			closeModal()
-			setReloadPost(!reloadPost)
+			setValidationErrors([]);
+
+			setReloadPost(!reloadPost);
+
+			// close modal
+			setIsPostModalOpen(false);
 		} catch (err) {
 			console.error(err);
 		}
@@ -128,82 +98,54 @@ function Home() {
 				<h1>Latest Posts</h1>
 				<p>Discover stories from our community</p>
 
-				<button onClick={openModal}>New Post</button>
+				<button onClick={openNewPostModal}>New Post</button>
 			</div>
 
 			<div className="posts-grid">
-				{posts.map(post => {
-					return (
-						<article className="card" key={post.id}>
-							<div className="card-body">
-								<h2 className="post-title">
-									<Link to={"/posts/" + post.id}>{post.title}</Link>
-								</h2>
-								<p className="post-meta">
-									<span>
-										By <Link to={"/users/" + post.author.id}>{post.author.username}</Link>
-									</span>
+				{posts.length === 0 ? (
+					<>
+						<p>No posts</p>
+					</>
+				) : (
+					posts.map(post => {
+						return (
+							<article className="card" key={post.id}>
+								<div className="card-body">
+									<h2 className="post-title">
+										<Link to={"/posts/" + post.id}>{post.title}</Link>
+									</h2>
+									<p className="post-meta">
+										<span>
+											By <Link to={"/users/" + post.author.id}>{post.author.username}</Link>
+										</span>
 
-									,&nbsp;
+										,&nbsp;
 
-									<span>
-										{new Date(post.updatedAt).toLocaleDateString()}
-									</span>
-								</p>
-							</div>
-						</article>
-					)
-				})}
+										<span>
+											{new Date(post.updatedAt).toLocaleDateString()}
+										</span>
+									</p>
+								</div>
+							</article>
+						)
+					})
+				)}
 			</div>
 
 			<div>
-				<Modal
-					isOpen={modalIsOpen}
-					onRequestClose={closeModal}
-					style={customStyles}
-					contentLabel="New Post Modal"
-				>
-					<div>
-						<button onClick={closeModal}>Cancel</button>
-						<h2>New Post</h2>
-					</div>
-
-					<div>
-						<input type="text" placeholder="Title" name="title" value={postTitle} onChange={handleChangePostTitle} />
-
-						<Editor
-							apiKey={TINYMCE_API}
-							onInit={(evt, editor) => editorRef.current = editor}
-							initialValue=""
-							init={{
-								height: 300,
-								menubar: false,
-								plugins: [
-									'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-									'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-									'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
-								],
-								toolbar: 'undo redo | blocks | ' +
-									'bold italic forecolor | alignleft aligncenter ' +
-									'alignright alignjustify | bullist numlist outdent indent | ' +
-									'removeformat | help',
-								content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-								branding: false,
-								placeholder: 'Content'
-							}}
-						/>
-
-						<div>
-							<label htmlFor="published">Is published: </label>
-							<select name="published" id="published" onChange={changeSelectOptionHandler}>
-								<option value="true">True</option>
-								<option value="false">False</option>
-							</select>
-						</div>
-					</div>
-
-					<button onClick={createNewPost}>Post</button>
-				</Modal>
+				<PostModal
+					modalTitle="New Post"
+					isOpen={isPostModalOpen}
+					setIsOpen={setIsPostModalOpen}
+					postTitle={postTitle}
+					postContent={postContent}
+					published={published}
+					setPostTitle={setPostTitle}
+					setPostContent={setPostContent}
+					setPublished={setPublished}
+					targetFunction={createNewPost}
+					validationErrors={validationErrors}
+				/>
 			</div>
 		</main >
 	);
