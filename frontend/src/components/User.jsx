@@ -25,8 +25,6 @@ function User() {
                 const res = await fetch(TARGET_URL);
                 const result = await res.json();
 
-                console.log('fetch user profile', result);
-
                 setdisplayUser(result.user);
             } catch (err) {
                 console.error(err);

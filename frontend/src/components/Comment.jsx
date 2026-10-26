@@ -35,9 +35,6 @@ function Comment({
 
             const result = await res.json();
 
-            console.log('res', result);
-
-
             if (!res.ok) {
                 setValidationErrors(result.errors);
                 return;
