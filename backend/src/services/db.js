@@ -108,6 +108,14 @@ async function getPostsByUserId(userId, published = true, orderBy = { updatedAt:
             authorId: userId,
             published
         },
+        include: {
+            author: {
+                select: {
+                    id: true,
+                    username: true
+                }
+            },
+        },
         orderBy
     })
 }

@@ -1,10 +1,9 @@
 import { useState, useEffect, useContext } from "react";
-import { useParams } from "react-router";
+import { useParams, Link } from "react-router";
 import AuthContext from "../context/AuthContext";
 
 
 const USERS_URL = import.meta.env.VITE_SERVER_URL + "/users";
-
 
 
 function User() {
@@ -43,10 +42,16 @@ function User() {
     }
 
     return (
-        <main>
+        <main className="container">
             <p>Username: {displayUser.username || "Null"}</p>
             <p>Name: {displayUser.name || "Null"}</p>
             <p>Email: {displayUser.email || "Null"}</p>
+
+            <Link to={"/users/" + userId + "/posts"}>View posts</Link>
+
+            {(user.profile && user.profile.id === displayUser.id) && (
+                <button>Edit</button>
+            )}
 
             {/* {(user.profile && user.profile.id === displayUser.id) && (
                 <button>Edit</button>

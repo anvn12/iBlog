@@ -5,6 +5,7 @@ import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Post from "./components/Post";
 import User from "./components/User";
+import UserPosts from "./components/UserPosts";
 
 
 const router = createBrowserRouter([
@@ -15,6 +16,7 @@ const router = createBrowserRouter([
 			{ index: true, Component: Home },
 			{ path: "/posts/:id", Component: Post },
 			{ path: "/users/:id", Component: User },
+			{ path: "/users/:id/posts", Component: UserPosts },
 		],
 	},
 	{

@@ -8,25 +8,10 @@ const SECRET_KEY = process.env.SECRET_KEY
 
 // get user data from jwt
 async function getUserFromJWT(req, res) {
-    const authHeader = req.headers.authorization
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.json({
-            message: 'Guest'
-        })
-    }
-
-    const token = authHeader.split(' ')[1]
-    try {
-        const decoded = jwt.verify(token, SECRET_KEY)
-        return res.json({
-            message: 'Authenticated',
-            payload: decoded
-        })
-    } catch {
-        return res.json({
-            message: 'Invalid or expired token'
-        })
-    }
+    return res.json({
+        message: 'Authenticated',
+        payload: req.user
+    })
 }
 
 
