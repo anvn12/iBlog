@@ -34,11 +34,6 @@ function UserPosts() {
 
                 const result = await res.json();
 
-                console.log('TARGET_URL', TARGET_URL);
-                console.log('result', result);
-
-
-
                 setDisplayPosts(result.posts);
             } catch (err) {
                 console.error(err);
@@ -79,7 +74,7 @@ function UserPosts() {
                     <tbody>
                         {displayPosts.length === 0 ? (
                             <tr>
-                                <td colspan="3">No posts</td>
+                                <td colSpan="3">No posts</td>
                             </tr>
                         ) : (
                             displayPosts.map(post => {
