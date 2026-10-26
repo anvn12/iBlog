@@ -48,8 +48,6 @@ function Comment({
     }
 
     async function deleteComment(commentId) {
-        setError(null);
-
         const TARGET_URL = `${SERVER_POSTS_ID_URL}/comments/${commentId}`;
 
         try {
@@ -61,17 +59,13 @@ function Comment({
                 }
             });
 
-            const result = await res.json();
-
             if (!res.ok) {
-                setError(result.error || result.message || "Failed to delete comment.");
                 return;
             }
 
             reload();
         } catch (err) {
             console.error(err);
-            setError("Unable to connect to the server. Please try again later.");
         }
     }
 

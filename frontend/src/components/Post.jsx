@@ -4,20 +4,20 @@ import AuthContext from "../context/AuthContext";
 import parse from 'html-react-parser';
 import DOMPurify from 'dompurify';
 
+import PostModal from "./PostModal";
 import Comment from "./Comment";
+
 
 const POSTS_URL = import.meta.env.VITE_SERVER_URL + "/posts";
 
 
-
 function Post() {
-    const user = useContext(AuthContext);
-    const navigate = useNavigate();
-
     const params = useParams();
     const postId = params.id;
-
     const SERVER_POSTS_ID_URL = `${POSTS_URL}/${postId}`
+
+    const user = useContext(AuthContext);
+    const navigate = useNavigate();
 
     const [reloadPost, setReloadPost] = useState(false); // change this var to reload the post (and the comments)
     const [post, setPost] = useState(null);
@@ -30,7 +30,14 @@ function Post() {
                 const res = await fetch(SERVER_POSTS_ID_URL);
                 const result = await res.json();
 
+                console.log('resut', result);
+
+
                 setPost(result.post);
+
+                setPostTitle(result.post.title);
+                setPostContent(result.post.content);
+                setPublished(result.post.published);
             } catch (err) {
                 console.error(err);
             }
@@ -40,6 +47,58 @@ function Post() {
     }, [SERVER_POSTS_ID_URL, reloadPost]);
 
 
+    // edit post modal
+    const [validationErrors, setValidationErrors] = useState([]);
+    const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+    const [postTitle, setPostTitle] = useState("");
+    const [postContent, setPostContent] = useState("");
+    const [published, setPublished] = useState(true);
+
+    function openNewPostModal() {
+        setValidationErrors([]);
+        setIsPostModalOpen(true);
+    }
+
+    async function editPost() {
+
+        const bodycon = {
+            title: postTitle.trim(),
+            content: postContent.trim() || "",
+            published
+        }
+        console.log(bodycon);
+
+
+        try {
+            const res = await fetch(SERVER_POSTS_ID_URL, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${user.JWT}`
+                },
+                body: JSON.stringify({
+                    title: postTitle.trim(),
+                    content: postContent.trim() || "",
+                    published
+                })
+            });
+
+            const result = await res.json();
+
+            if (!res.ok) {
+                if (result.errors) {
+                    setValidationErrors(result.errors);
+                }
+                return;
+            }
+
+            setValidationErrors([]);
+            setIsPostModalOpen(false);
+            reload();
+        } catch (err) {
+            console.error(err);
+        }
+    }
     async function deletePost() {
         try {
             const res = await fetch(SERVER_POSTS_ID_URL, {
@@ -77,23 +136,29 @@ function Post() {
             <div>
                 <h1>{post.title && post.title}</h1>
 
-                <p>
-                    Author:
-                    &nbsp;
-                    <Link to={"/users/" + post.author.id}>
-                        {post.author && post.author.username}
-                    </Link>
-                </p>
+                <div>
+                    <p>
+                        Author:
+                        &nbsp;
+                        <Link to={"/users/" + post.author.id}>
+                            {post.author && post.author.username}
+                        </Link>
+                    </p>
 
-                {/* <p>{post.createdAt && "createdAt: " + (new Date(post.createdAt).toLocaleDateString())}</p> */}
-                {/* <p>{post.updatedAt && "updatedAt: " + (new Date(post.updatedAt).toLocaleDateString())}</p> */}
+                    {/* <p>{post.createdAt && "createdAt: " + (new Date(post.createdAt).toLocaleDateString())}</p> */}
+                    {/* <p>{post.updatedAt && "updatedAt: " + (new Date(post.updatedAt).toLocaleDateString())}</p> */}
+                </div>
 
-                {post.content && <div className="post-content">{parse(DOMPurify.sanitize(post.content))}</div>}
-
-                {
-                    (user.profile && post.author.id === user.profile.id) &&
-                    <button onClick={() => deletePost()}>Remove Post</button>
+                {(user.profile && post.author.id === user.profile.id) &&
+                    <div>
+                        <button onClick={openNewPostModal}>Edit</button>
+                        <button onClick={deletePost}>Remove</button>
+                    </div>
                 }
+
+                <div>
+                    {post.content && <div className="post-content">{parse(DOMPurify.sanitize(post.content))}</div>}
+                </div>
             </div>
 
             <Comment
@@ -102,6 +167,22 @@ function Post() {
                 reload={reload}
                 SERVER_POSTS_ID_URL={SERVER_POSTS_ID_URL}
             />
+
+            <div>
+                <PostModal
+                    modalTitle="Edit Post"
+                    isOpen={isPostModalOpen}
+                    setIsOpen={setIsPostModalOpen}
+                    postTitle={postTitle}
+                    postContent={postContent}
+                    published={published}
+                    setPostTitle={setPostTitle}
+                    setPostContent={setPostContent}
+                    setPublished={setPublished}
+                    targetFunction={editPost}
+                    validationErrors={validationErrors}
+                />
+            </div>
         </main >
     );
 }
