@@ -1,13 +1,11 @@
-const express = require('express')
-const router = express.Router()
-
+const express = require("express");
+const router = express.Router();
 
 // Log in
-router.get('/', (req, res) => {
-    res.json({
-        message: "This is home"
-    })
-})
+router.get("/", (req, res) => {
+	res.json({
+		message: "This is home",
+	});
+});
 
-
-module.exports = router
+module.exports = router;

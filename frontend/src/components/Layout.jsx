@@ -6,33 +6,45 @@ import AuthContext from "../context/AuthContext";
 function Layout() {
 	const user = useContext(AuthContext);
 
-
 	function logout() {
 		user.removeJWT();
 	}
-
 
 	return (
 		<>
 			<header className="navbar">
 				<div className="container">
-					<NavLink to="/" className="navbar-brand">iBlog</NavLink>
-
+					<NavLink to="/" className="navbar-brand">
+						iBlog
+					</NavLink>
 
 					<nav>
 						<ul className="navbar-nav">
-							{user.profile &&
+							{user.profile && (
 								<li>
-									<NavLink to={"/users/" + user.profile.id}>{user.profile.username}</NavLink>
+									<NavLink to={"/users/" + user.profile.id}>
+										{user.profile.username}
+									</NavLink>
 								</li>
-							}
+							)}
 
 							{user.JWT ? (
-								<li><button className="btn btn-secondary btn-sm" onClick={logout}>Log out</button></li>
+								<li>
+									<button
+										className="btn btn-secondary btn-sm"
+										onClick={logout}
+									>
+										Log out
+									</button>
+								</li>
 							) : (
 								<>
-									<li><NavLink to="/login">Log in</NavLink></li>
-									<li><NavLink to="/signup">Sign up</NavLink></li>
+									<li>
+										<NavLink to="/login">Log in</NavLink>
+									</li>
+									<li>
+										<NavLink to="/signup">Sign up</NavLink>
+									</li>
 								</>
 							)}
 						</ul>
@@ -44,7 +56,10 @@ function Layout() {
 				<Outlet />
 			</div>
 
-			<footer className="text-center text-muted" style={{ padding: '24px' }}>
+			<footer
+				className="text-center text-muted"
+				style={{ padding: "24px" }}
+			>
 				&copy; {new Date().getFullYear()} iBlog. All rights reserved.
 			</footer>
 		</>

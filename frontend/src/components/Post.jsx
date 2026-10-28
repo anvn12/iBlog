@@ -1,173 +1,177 @@
 import { useState, useEffect, useContext } from "react";
 import { useParams, Link, useNavigate } from "react-router";
 import AuthContext from "../context/AuthContext";
-import parse from 'html-react-parser';
-import DOMPurify from 'dompurify';
+import parse from "html-react-parser";
+import DOMPurify from "dompurify";
 
 import Comment from "./Comment";
 import PostModal from "./PostModal";
 import ModalController from "./ModalController";
 
-
 const POSTS_URL = import.meta.env.VITE_SERVER_URL + "/posts";
 
-
 function Post() {
-    const params = useParams();
-    const postId = params.id;
-    const SERVER_POSTS_ID_URL = `${POSTS_URL}/${postId}`
+	const params = useParams();
+	const postId = params.id;
+	const SERVER_POSTS_ID_URL = `${POSTS_URL}/${postId}`;
 
-    const user = useContext(AuthContext);
-    const navigate = useNavigate();
+	const user = useContext(AuthContext);
+	const navigate = useNavigate();
 
-    const [reloadPost, setReloadPost] = useState(false); // change this var to reload the post (and the comments)
-    const [post, setPost] = useState(null);
+	const [reloadPost, setReloadPost] = useState(false); // change this var to reload the post (and the comments)
+	const [post, setPost] = useState(null);
 
+	// Fetch post details
+	useEffect(() => {
+		async function fetchPost() {
+			try {
+				const res = await fetch(SERVER_POSTS_ID_URL);
+				const result = await res.json();
 
-    // Fetch post details
-    useEffect(() => {
-        async function fetchPost() {
-            try {
-                const res = await fetch(SERVER_POSTS_ID_URL);
-                const result = await res.json();
+				setPost(result.post);
+			} catch (err) {
+				console.error(err);
+			}
+		}
 
-                setPost(result.post);
-            } catch (err) {
-                console.error(err);
-            }
-        }
+		fetchPost();
+	}, [SERVER_POSTS_ID_URL, reloadPost]);
 
-        fetchPost();
-    }, [SERVER_POSTS_ID_URL, reloadPost]);
+	async function deletePost() {
+		try {
+			const res = await fetch(SERVER_POSTS_ID_URL, {
+				method: "DELETE",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${user.JWT}`,
+				},
+			});
 
+			if (!res.ok) {
+				return;
+			}
 
-    async function deletePost() {
-        try {
-            const res = await fetch(SERVER_POSTS_ID_URL, {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${user.JWT}`
-                }
-            });
+			navigate("/");
+		} catch (err) {
+			console.error(err);
+		}
+	}
 
-            if (!res.ok) {
-                return;
-            }
+	// edit post modal
+	const [modalIsOpen, setModalIsOpen] = useState(false);
+	const [validationErrors, setValidationErrors] = useState([]);
+	const modalController = new ModalController(
+		"Edit Post",
+		modalIsOpen,
+		setModalIsOpen
+	);
 
-            navigate('/');
-        } catch (err) {
-            console.error(err);
-        }
-    }
+	async function editPost(title, content, published) {
+		try {
+			const res = await fetch(SERVER_POSTS_ID_URL, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${user.JWT}`,
+				},
+				body: JSON.stringify({
+					title: title.trim(),
+					content: content.trim() || "",
+					published,
+				}),
+			});
 
+			const result = await res.json();
 
-    // edit post modal
-    const [modalIsOpen, setModalIsOpen] = useState(false);
-    const [validationErrors, setValidationErrors] = useState([]);
-    const modalController = new ModalController("Edit Post", modalIsOpen, setModalIsOpen)
+			if (!res.ok) {
+				if (result.errors) {
+					setValidationErrors(result.errors);
+				}
+				return;
+			}
 
+			setValidationErrors([]);
+			modalController.closeModal();
 
-    async function editPost(title, content, published) {
-        try {
-            const res = await fetch(SERVER_POSTS_ID_URL, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${user.JWT}`
-                },
-                body: JSON.stringify({
-                    title: title.trim(),
-                    content: content.trim() || "",
-                    published
-                })
-            });
+			reload();
+		} catch (err) {
+			console.error(err);
+		}
+	}
 
-            const result = await res.json();
+	function reload() {
+		setReloadPost(!reloadPost);
+	}
 
-            if (!res.ok) {
-                if (result.errors) {
-                    setValidationErrors(result.errors);
-                }
-                return;
-            }
+	if (!post) {
+		return <></>;
+	}
 
-            setValidationErrors([]);
-            modalController.closeModal()
+	return (
+		<main className="container">
+			<div>
+				<h1>{post.title && post.title}</h1>
 
-            reload();
-        } catch (err) {
-            console.error(err);
-        }
-    }
+				<div>
+					<p>
+						Author: &nbsp;
+						<Link to={"/users/" + post.author.id}>
+							{post.author && post.author.username}
+						</Link>
+					</p>
 
+					<p>
+						{post.createdAt &&
+							"Created at: " +
+								new Date(post.createdAt).toLocaleDateString()}
+						&nbsp;
+						{post.updatedAt &&
+							"Updated at: " +
+								new Date(post.updatedAt).toLocaleDateString()}
+					</p>
+				</div>
 
-    function reload() {
-        setReloadPost(!reloadPost);
-    }
+				{user.profile && post.author.id === user.profile.id && (
+					<div>
+						<button
+							onClick={() => {
+								setValidationErrors([]);
+								modalController.openModal();
+							}}
+						>
+							Edit
+						</button>
 
+						<button onClick={deletePost}>Remove</button>
+					</div>
+				)}
 
-    if (!post) {
-        return <></>
-    }
+				<div>
+					{post.content && (
+						<div className="post-content">
+							{parse(DOMPurify.sanitize(post.content))}
+						</div>
+					)}
+				</div>
+			</div>
 
+			<Comment
+				user={user}
+				comments={post.comments}
+				reload={reload}
+				SERVER_POSTS_ID_URL={SERVER_POSTS_ID_URL}
+			/>
 
-    return (
-        <main className="container">
-            <div>
-                <h1>{post.title && post.title}</h1>
-
-                <div>
-                    <p>
-                        Author:
-                        &nbsp;
-                        <Link to={"/users/" + post.author.id}>
-                            {post.author && post.author.username}
-                        </Link>
-                    </p>
-
-                    <p>
-                        {post.createdAt && "Created at: " + (new Date(post.createdAt).toLocaleDateString())}
-                        &nbsp;
-                        {post.updatedAt && "Updated at: " + (new Date(post.updatedAt).toLocaleDateString())}
-                    </p>
-                </div>
-
-                {(user.profile && post.author.id === user.profile.id) &&
-                    <div>
-                        <button onClick={() => {
-                            setValidationErrors([]);
-                            modalController.openModal()
-                        }}>
-                            Edit
-                        </button>
-
-                        <button onClick={deletePost}>Remove</button>
-                    </div>
-                }
-
-                <div>
-                    {post.content && <div className="post-content">{parse(DOMPurify.sanitize(post.content))}</div>}
-                </div>
-            </div>
-
-            <Comment
-                user={user}
-                comments={post.comments}
-                reload={reload}
-                SERVER_POSTS_ID_URL={SERVER_POSTS_ID_URL}
-            />
-
-            <div>
-                <PostModal
-                    modalController={modalController}
-                    originalPost={post}
-                    targetFunction={editPost}
-                    validationErrors={validationErrors}
-                />
-            </div>
-        </main >
-    );
+			<div>
+				<PostModal
+					modalController={modalController}
+					originalPost={post}
+					targetFunction={editPost}
+					validationErrors={validationErrors}
+				/>
+			</div>
+		</main>
+	);
 }
 
 export default Post;

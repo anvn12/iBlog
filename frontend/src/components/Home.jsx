@@ -5,14 +5,11 @@ import { Link, useNavigate } from "react-router";
 import PostModal from "./PostModal";
 import ModalController from "./ModalController";
 
-
 const POSTS_URL = import.meta.env.VITE_SERVER_URL + "/posts";
-
 
 function Home() {
 	const user = useContext(AuthContext);
 	const navigate = useNavigate();
-
 
 	// fetch posts
 	const [reloadPost, setReloadPost] = useState(false); // change this var to reload the post (and the comments)
@@ -32,16 +29,18 @@ function Home() {
 		fetchPost();
 	}, [reloadPost]);
 
-
 	// New post modal
 	const [modalIsOpen, setModalIsOpen] = useState(false);
 	const [validationErrors, setValidationErrors] = useState([]);
-	const modalController = new ModalController("New Post", modalIsOpen, setModalIsOpen)
+	const modalController = new ModalController(
+		"New Post",
+		modalIsOpen,
+		setModalIsOpen
+	);
 
 	// const [postTitle, setPostTitle] = useState("");
 	// const [postContent, setPostContent] = useState("");
 	// const [published, setPublished] = useState(true);
-
 
 	async function createNewPost(title, content, published) {
 		setValidationErrors([]);
@@ -51,12 +50,12 @@ function Home() {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					"Authorization": `Bearer ${user.JWT}`
+					Authorization: `Bearer ${user.JWT}`,
 				},
 				body: JSON.stringify({
 					title: title.trim(),
 					content: content.trim() || "",
-					published
+					published,
 				}),
 			});
 
@@ -70,7 +69,7 @@ function Home() {
 			}
 
 			setValidationErrors([]);
-			modalController.closeModal()
+			modalController.closeModal();
 
 			setReloadPost(!reloadPost);
 		} catch (err) {
@@ -78,17 +77,18 @@ function Home() {
 		}
 	}
 
-
 	return (
 		<main className="container">
 			<div className="page-header">
 				<h1>Latest Posts</h1>
 				<p>Discover stories from our community</p>
 
-				<button onClick={() => {
-					setValidationErrors([]);
-					modalController.openModal()
-				}}>
+				<button
+					onClick={() => {
+						setValidationErrors([]);
+						modalController.openModal();
+					}}
+				>
 					New Post
 				</button>
 			</div>
@@ -99,27 +99,34 @@ function Home() {
 						<p>No posts</p>
 					</>
 				) : (
-					posts.map(post => {
+					posts.map((post) => {
 						return (
 							<article className="card" key={post.id}>
 								<div className="card-body">
 									<h2 className="post-title">
-										<Link to={"/posts/" + post.id}>{post.title}</Link>
+										<Link to={"/posts/" + post.id}>
+											{post.title}
+										</Link>
 									</h2>
 									<p className="post-meta">
 										<span>
-											By <Link to={"/users/" + post.author.id}>{post.author.username}</Link>
+											By{" "}
+											<Link
+												to={"/users/" + post.author.id}
+											>
+												{post.author.username}
+											</Link>
 										</span>
-
 										,&nbsp;
-
 										<span>
-											{new Date(post.updatedAt).toLocaleDateString()}
+											{new Date(
+												post.updatedAt
+											).toLocaleDateString()}
 										</span>
 									</p>
 								</div>
 							</article>
-						)
+						);
 					})
 				)}
 			</div>
@@ -132,7 +139,7 @@ function Home() {
 					validationErrors={validationErrors}
 				/>
 			</div>
-		</main >
+		</main>
 	);
 }
 

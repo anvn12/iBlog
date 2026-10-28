@@ -22,19 +22,19 @@ app.use("/users", usersRouter);
 
 // Not found handler (404)
 app.use((req, res, next) => {
-  res.status(404).json({ error: "Endpoint not found" });
+	res.status(404).json({ error: "Endpoint not found" });
 });
 
 // Error handler (500)
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: "Internal Server Error" });
+	console.error(err.stack);
+	res.status(500).json({ error: "Internal Server Error" });
 });
 
 app.listen(PORT, (err) => {
-  if (err) {
-    console.error(err);
-    return;
-  }
-  console.log(`Server is running on http://localhost:${PORT}`);
+	if (err) {
+		console.error(err);
+		return;
+	}
+	console.log(`Server is running on http://localhost:${PORT}`);
 });

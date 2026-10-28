@@ -1,23 +1,27 @@
 {
-  "name": "iblog",
-  "version": "1.0.0",
-  "description": "iBlog/\r ├── frontend/                      # React Frontend (Vite or Create React App)\r │   ├── public/\r │   ├── src/\r │   │   ├── assets/\r │   │   ├── components/          # Reusable UI components (Button, Modal, etc.)\r │   │   ├── context/             # React Context (Auth, Theme, etc.)\r │   │   ├── hooks/               # Custom React hooks\r │   │   ├── pages/               # Page-level components (Home, Dashboard, etc.)\r │   │   ├── services/            # API client setup (Axios/Fetch wrappers)\r │   │   ├── App.jsx\r │   │   └── main.jsx\r │   ├── package.json\r │   └── vite.config.js\r │\r ├── backend/                      # Node.js & Express Backend\r │   ├── prisma/                  # Prisma ORM layer\r │   │   ├── migrations/          # Database migration history\r │   │   └── schema.prisma        # Database models & configuration\r │   ├── src/\r │   │   ├── config/              # Configuration files (e.g., passport, db client)\r │   │   ├── controllers/         # Request handlers / Business logic\r │   │   ├── middlewares/         # Custom Express middlewares (auth, error handling)\r │   │   ├── routes/              # Express route definitions\r │   │   ├── services/            # Data access & complex operations (Prisma calls)\r │   │   ├── utils/               # Helper functions & validators\r │   │   ├── app.js               # Express app setup & middleware wiring\r │   │   └── server.js            # HTTP server listener\r │   ├── .env                     # Backend environment variables (DATABASE_URL, etc.)\r │   ├── package.json\r │\r ├── .gitignore\r ├── package.json                 # Root package.json (optional workspace scripts)\r └── README.md",
-  "homepage": "https://github.com/anvn12/iBlog#readme",
-  "bugs": {
-    "url": "https://github.com/anvn12/iBlog/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/anvn12/iBlog.git"
-  },
-  "license": "ISC",
-  "author": "",
-  "type": "commonjs",
-  "main": "index.js",
-  "scripts": {
-    "dev": "npm run dev:fe && npm run dev:be",
-    "dev:fe": "cd frontend && npm run dev",
-    "dev:be": "cd backend && npm run dev",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  }
+	"name": "iblog",
+	"version": "1.0.0",
+	"description": "iBlog/\r ├── frontend/                      # React Frontend (Vite or Create React App)\r │   ├── public/\r │   ├── src/\r │   │   ├── assets/\r │   │   ├── components/          # Reusable UI components (Button, Modal, etc.)\r │   │   ├── context/             # React Context (Auth, Theme, etc.)\r │   │   ├── hooks/               # Custom React hooks\r │   │   ├── pages/               # Page-level components (Home, Dashboard, etc.)\r │   │   ├── services/            # API client setup (Axios/Fetch wrappers)\r │   │   ├── App.jsx\r │   │   └── main.jsx\r │   ├── package.json\r │   └── vite.config.js\r │\r ├── backend/                      # Node.js & Express Backend\r │   ├── prisma/                  # Prisma ORM layer\r │   │   ├── migrations/          # Database migration history\r │   │   └── schema.prisma        # Database models & configuration\r │   ├── src/\r │   │   ├── config/              # Configuration files (e.g., passport, db client)\r │   │   ├── controllers/         # Request handlers / Business logic\r │   │   ├── middlewares/         # Custom Express middlewares (auth, error handling)\r │   │   ├── routes/              # Express route definitions\r │   │   ├── services/            # Data access & complex operations (Prisma calls)\r │   │   ├── utils/               # Helper functions & validators\r │   │   ├── app.js               # Express app setup & middleware wiring\r │   │   └── server.js            # HTTP server listener\r │   ├── .env                     # Backend environment variables (DATABASE_URL, etc.)\r │   ├── package.json\r │\r ├── .gitignore\r ├── package.json                 # Root package.json (optional workspace scripts)\r └── README.md",
+	"homepage": "https://github.com/anvn12/iBlog#readme",
+	"bugs": {
+		"url": "https://github.com/anvn12/iBlog/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/anvn12/iBlog.git"
+	},
+	"license": "ISC",
+	"author": "",
+	"type": "commonjs",
+	"main": "index.js",
+	"scripts": {
+		"dev": "npm run dev:fe && npm run dev:be",
+		"dev:fe": "cd frontend && npm run dev",
+		"dev:be": "cd backend && npm run dev",
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\""
+	},
+	"devDependencies": {
+		"prettier": "^3.9.10"
+	}
 }

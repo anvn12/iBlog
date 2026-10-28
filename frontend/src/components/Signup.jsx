@@ -4,7 +4,6 @@ import AuthContext from "../context/AuthContext";
 
 const SIGNUP_URL = import.meta.env.VITE_SERVER_URL + "/auth/signup";
 
-
 function Signup() {
 	const navigate = useNavigate();
 
@@ -14,14 +13,12 @@ function Signup() {
 	const [error, setError] = useState(null);
 	const [validationErrors, setValidationErrors] = useState([]);
 
-
 	const user = useContext(AuthContext);
 	useEffect(() => {
 		if (user.JWTToken) {
 			navigate("/");
 		}
 	}, [navigate, user.JWTToken]);
-
 
 	function handleChangeUsername(event) {
 		setUsername(event.target.value);
@@ -33,12 +30,10 @@ function Signup() {
 		setConfirmPassword(event.target.value);
 	}
 
-
 	async function handleSubmit(event) {
 		event.preventDefault();
 		setError(null);
 		setValidationErrors([]);
-
 
 		// Client-side quick check
 		if (password !== confirmPassword) {
@@ -67,7 +62,9 @@ function Signup() {
 				if (result.errors) {
 					setValidationErrors(result.errors);
 				} else {
-					setError(result.error || result.message || "Failed to sign up.");
+					setError(
+						result.error || result.message || "Failed to sign up."
+					);
 				}
 				return;
 			}
@@ -80,7 +77,9 @@ function Signup() {
 			}
 		} catch (err) {
 			console.error(err);
-			setError("Unable to connect to the server. Please try again later.");
+			setError(
+				"Unable to connect to the server. Please try again later."
+			);
 		}
 	}
 
@@ -101,18 +100,23 @@ function Signup() {
 				<p>Join our community today</p>
 			</div>
 
-			<div className="card" style={{ maxWidth: '480px', margin: '0 auto' }}>
+			<div
+				className="card"
+				style={{ maxWidth: "480px", margin: "0 auto" }}
+			>
 				<div className="card-body">
 					<form onSubmit={handleSubmit}>
 						{error && (
 							<div className="form-group">
-								<p style={{ color: '#ef4444' }}>{error}</p>
+								<p style={{ color: "#ef4444" }}>{error}</p>
 							</div>
 						)}
 
 						<div className="form-group">
 							{getFieldError("username")}
-							<label className="form-label" htmlFor="username">Username</label>
+							<label className="form-label" htmlFor="username">
+								Username
+							</label>
 							<input
 								type="text"
 								name="username"
@@ -127,7 +131,9 @@ function Signup() {
 
 						<div className="form-group">
 							{getFieldError("password")}
-							<label className="form-label" htmlFor="password">Password</label>
+							<label className="form-label" htmlFor="password">
+								Password
+							</label>
 							<input
 								type="password"
 								name="password"
@@ -141,7 +147,12 @@ function Signup() {
 
 						<div className="form-group">
 							{getFieldError("confirmPassword")}
-							<label className="form-label" htmlFor="confirmPassword">Confirm Password</label>
+							<label
+								className="form-label"
+								htmlFor="confirmPassword"
+							>
+								Confirm Password
+							</label>
 							<input
 								type="password"
 								name="confirmPassword"
@@ -153,7 +164,13 @@ function Signup() {
 							/>
 						</div>
 
-						<button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Sign up</button>
+						<button
+							type="submit"
+							className="btn btn-primary"
+							style={{ width: "100%" }}
+						>
+							Sign up
+						</button>
 					</form>
 				</div>
 				<div>
