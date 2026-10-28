@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 
 const SECRET_KEY = process.env.SECRET_KEY;
 
-function signJWTToken(user) {
+function signJWT(user) {
 	if (!SECRET_KEY) {
 		throw new Error("SECRET_KEY environment variable is not defined");
 	}
@@ -44,6 +44,6 @@ function authenticateToken(req, res, next) {
 }
 
 module.exports = {
-	signJWTToken,
+	signJWT,
 	authenticateToken,
 };

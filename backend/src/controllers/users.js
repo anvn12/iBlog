@@ -1,6 +1,5 @@
 require("dotenv").config();
 const db = require("../services/db");
-const jwt = require("jsonwebtoken");
 const { body, validationResult } = require("express-validator");
 
 const SECRET_KEY = process.env.SECRET_KEY;
@@ -104,7 +103,7 @@ async function getUserPosts(req, res, next) {
 				: true;
 		if (published === false) {
 			// verify if current user is the target user
-			const currentUser = req.user.user;
+			const currentUser = req.user?.user || {};
 			if (!currentUser || currentUser.id !== user.id) {
 				return res.status(403).json({
 					error: "User is not authorized",

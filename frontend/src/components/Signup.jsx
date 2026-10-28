@@ -16,10 +16,10 @@ function Signup() {
 
 	const user = useContext(AuthContext);
 	useEffect(() => {
-		if (user.JWTToken) {
+		if (user.JWT) {
 			navigate("/");
 		}
-	}, [navigate, user.JWTToken]);
+	}, [navigate, user.JWT]);
 
 	function handleChangeUsername(event) {
 		setUsername(event.target.value);

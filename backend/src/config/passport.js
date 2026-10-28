@@ -1,7 +1,6 @@
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const bcrypt = require("bcrypt");
-const db = require("../services/db");
 const prisma = require("../lib/prisma.js");
 
 // Local strategy for login with username and password

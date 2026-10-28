@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const passport = require("../config/passport");
 const db = require("../services/db");
-const { signJWTToken } = require("../utils/jwt");
+const { signJWT } = require("../utils/jwt");
 const { body, validationResult } = require("express-validator");
 
 // Login
@@ -32,7 +32,7 @@ const postLogin = [
 				// Log in match -> return token -> client stores it to localStorage
 
 				// Sign JWT
-				const token = signJWTToken(user);
+				const token = signJWT(user);
 
 				res.json({
 					message: "Login successfully",
@@ -87,7 +87,7 @@ const postSignup = [
 
 			// Create new user in db
 			const newUser = await db.createNewUser(username, hashedPassword);
-			const token = signJWTToken(newUser);
+			const token = signJWT(newUser);
 
 			res.status(201).json({
 				message: "Signup successfully",
