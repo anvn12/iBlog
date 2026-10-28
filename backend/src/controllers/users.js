@@ -8,7 +8,7 @@ const SECRET_KEY = process.env.SECRET_KEY;
 async function getUserFromJWT(req, res) {
 	return res.json({
 		message: "Authenticated",
-		payload: req.user,
+		user: req.user,
 	});
 }
 
@@ -62,7 +62,7 @@ const updateUserProfile = [
 			}
 
 			// verify if current user is the User author
-			const currentUser = req.user.user;
+			const currentUser = req.user;
 			if (currentUser.id !== user.id) {
 				return res.status(403).json({
 					error: "User is not authorized to update this profile",
@@ -103,7 +103,7 @@ async function getUserPosts(req, res, next) {
 				: true;
 		if (published === false) {
 			// verify if current user is the target user
-			const currentUser = req.user?.user || {};
+			const currentUser = req.user || {};
 			if (!currentUser || currentUser.id !== user.id) {
 				return res.status(403).json({
 					error: "User is not authorized",

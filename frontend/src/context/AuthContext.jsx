@@ -25,7 +25,7 @@ function AuthProvider({ children }) {
 
 				const payload = await res.json();
 
-				setProfile(payload.payload.user);
+				setProfile(payload.user);
 			}
 		}
 

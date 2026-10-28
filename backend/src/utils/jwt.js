@@ -11,10 +11,8 @@ function signJWT(user) {
 	const token = jwt.sign(
 		{
 			// Payload
-			user: {
-				id: user.id,
-				username: user.username,
-			},
+			id: user.id,
+			username: user.username,
 		},
 		SECRET_KEY,
 		{ expiresIn: "7d" }

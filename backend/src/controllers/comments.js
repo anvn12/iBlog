@@ -23,7 +23,7 @@ const createComment = [
 			}
 
 			const content = req.body.content.trim();
-			const authorId = req.user.user.id; // req.user is decoded from the JWT
+			const authorId = req.user.id; // req.user is decoded from the JWT
 
 			// Create new comment in db
 			const newComment = await db.createNewComment(
@@ -66,7 +66,7 @@ const updateComment = [
 			}
 
 			// verify if current user is the comment author
-			const currentUser = req.user.user;
+			const currentUser = req.user;
 			if (currentUser.id !== comment.authorId) {
 				return res.status(403).json({
 					error: "User is not the comment author",
@@ -107,7 +107,7 @@ async function deleteComment(req, res, next) {
 		}
 
 		// verify if current user is the comment author
-		const currentUser = req.user.user;
+		const currentUser = req.user;
 		if (currentUser.id !== comment.authorId) {
 			return res.status(403).json({
 				error: "User is not the comment author",

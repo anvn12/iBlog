@@ -34,7 +34,7 @@ const createPost = [
 				req.body.published === true ||
 				req.body.published === "true" ||
 				false;
-			const authorId = req.user.user.id; // req.user is decoded from the JWT
+			const authorId = req.user.id; // req.user is decoded from the JWT
 
 			// Create new post in db
 			const newPost = await db.createNewPost(
@@ -66,7 +66,7 @@ async function getPost(req, res, next) {
 		}
 
 		// Unpublished posts are only visible to their author
-		const currentUser = req.user?.user;
+		const currentUser = req.user;
 		if (!post.published && currentUser?.id !== post.authorId) {
 			return next();
 		}
@@ -99,7 +99,7 @@ const updatePost = [
 			}
 
 			// verify if current user is the post author
-			const currentUser = req.user.user;
+			const currentUser = req.user;
 			if (currentUser.id !== post.authorId) {
 				return res.status(403).json({
 					error: "User is not the post author",
@@ -145,7 +145,7 @@ async function deletePost(req, res, next) {
 		}
 
 		// verify if current user is the post author
-		const currentUser = req.user.user;
+		const currentUser = req.user;
 		if (currentUser.id !== post.authorId) {
 			return res.status(403).json({
 				error: "User is not the post author",
