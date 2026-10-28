@@ -10,6 +10,7 @@ function Comment({
 }) {
     const [commentContent, setCommentContent] = useState("");
     const [validationErrors, setValidationErrors] = useState([]);
+    const [validationEditingCommentErrors, setValidationEditingCommentErrors] = useState([]);
     const [editingComment, setEditingComment] = useState({
         status: false,
         commentId: "",
@@ -78,7 +79,7 @@ function Comment({
 
     // Edit comment
     function toggleEditComment(comment) {
-        console.log("clicked edit");
+        setValidationEditingCommentErrors([]);
 
         setEditingComment({
             status: true,
@@ -93,6 +94,8 @@ function Comment({
         })
     }
     function closeEditingComment() {
+        setValidationEditingCommentErrors([]);
+
         setEditingComment({
             ...editingComment,
             status: false,
@@ -117,11 +120,12 @@ function Comment({
 
             if (!res.ok) {
                 if (result.errors) {
-                    setValidationErrors(result.errors);
+                    setValidationEditingCommentErrors(result.errors);
                 }
                 return;
             }
 
+            setValidationEditingCommentErrors([]);
             closeEditingComment();
             reload();
         } catch (err) {
@@ -133,6 +137,16 @@ function Comment({
     // error message
     function getFieldError(fieldName) {
         return validationErrors
+            .filter((error) => error.path === fieldName)
+            .map((error, i) => (
+                <p key={i} role="alert" style={{ color: "red" }}>
+                    {error.msg}
+                </p>
+            ));
+    }
+
+    function getEditingCommentError(fieldName) {
+        return validationEditingCommentErrors
             .filter((error) => error.path === fieldName)
             .map((error, i) => (
                 <p key={i} role="alert" style={{ color: "red" }}>
@@ -187,6 +201,8 @@ function Comment({
                             editingComment.commentId === comment.id) ? (
 
                             <div>
+                                {getEditingCommentError("content")}
+
                                 <input
                                     type="text"
                                     value={editingComment.content}
