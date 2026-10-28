@@ -7,6 +7,7 @@ import DOMPurify from "dompurify";
 
 import Comment from "./Comment";
 import PostModal from "./PostModal";
+import ConfirmModal from "./ConfirmModal";
 import ModalController from "./ModalController";
 
 const POSTS_URL = import.meta.env.VITE_SERVER_URL + "/posts";
@@ -66,6 +67,14 @@ function Post() {
 		"Edit Post",
 		modalIsOpen,
 		setModalIsOpen
+	);
+
+	// delete post confirm modal
+	const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false);
+	const deleteModalController = new ModalController(
+		"Remove Post",
+		deleteModalIsOpen,
+		setDeleteModalIsOpen
 	);
 
 	async function editPost(title, content, published) {
@@ -157,7 +166,7 @@ function Post() {
 
 						<button
 							className="btn btn-danger btn-sm"
-							onClick={deletePost}
+							onClick={() => deleteModalController.openModal()}
 						>
 							Remove
 						</button>
@@ -183,6 +192,12 @@ function Post() {
 				originalPost={post}
 				targetFunction={editPost}
 				validationErrors={validationErrors}
+			/>
+
+			<ConfirmModal
+				modalController={deleteModalController}
+				onConfirm={deletePost}
+				message="Are you sure you want to remove this post? This action cannot be undone."
 			/>
 		</main>
 	);

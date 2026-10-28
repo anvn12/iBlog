@@ -771,6 +771,42 @@ tbody tr:last-child td {
 	border-top: 1px solid #e2e8f0;
 }
 
+/* ========== Confirm Modal Styling ========== */
+.confirm-modal {
+	background: #ffffff;
+	border-radius: 12px;
+	overflow: hidden;
+}
+
+.confirm-modal-header {
+	padding: 20px 24px 12px;
+}
+
+.confirm-modal-header h3 {
+	margin: 0;
+	font-size: 1.25rem;
+	color: #1a1a2e;
+}
+
+.confirm-modal-body {
+	padding: 0 24px 20px;
+}
+
+.confirm-modal-body p {
+	margin: 0;
+	color: #64748b;
+	font-size: 1rem;
+}
+
+.confirm-modal-footer {
+	padding: 16px 24px;
+	background: #f8fafc;
+	display: flex;
+	justify-content: flex-end;
+	gap: 12px;
+	border-top: 1px solid #e2e8f0;
+}
+
 /* ========== Error Messages ========== */
 .error-message {
 	color: #ef4444;

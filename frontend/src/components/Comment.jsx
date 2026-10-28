@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import { toast } from "react-toastify";
+import ConfirmModal from "./ConfirmModal";
+import ModalController from "./ModalController";
 
 function Comment({ user, comments, reload, SERVER_POSTS_ID_URL }) {
 	const [commentContent, setCommentContent] = useState("");
@@ -12,6 +14,15 @@ function Comment({ user, comments, reload, SERVER_POSTS_ID_URL }) {
 		commentId: "",
 		content: "",
 	});
+
+	// delete comment confirm modal
+	const [deleteCommentId, setDeleteCommentId] = useState(null);
+	const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false);
+	const deleteModalController = new ModalController(
+		"Remove Comment",
+		deleteModalIsOpen,
+		setDeleteModalIsOpen
+	);
 
 	const COMMENTS_URL = `${SERVER_POSTS_ID_URL}/comments`;
 
@@ -50,8 +61,9 @@ function Comment({ user, comments, reload, SERVER_POSTS_ID_URL }) {
 		}
 	}
 
-	async function deleteComment(commentId) {
-		const TARGET_URL = `${COMMENTS_URL}/${commentId}`;
+	async function deleteComment() {
+		if (!deleteCommentId) return;
+		const TARGET_URL = `${COMMENTS_URL}/${deleteCommentId}`;
 
 		try {
 			const res = await fetch(TARGET_URL, {
@@ -67,10 +79,16 @@ function Comment({ user, comments, reload, SERVER_POSTS_ID_URL }) {
 			}
 
 			toast.success("Successfully deleted comment");
+			setDeleteCommentId(null);
 			reload();
 		} catch (err) {
 			console.error(err);
 		}
+	}
+
+	function openDeleteModal(commentId) {
+		setDeleteCommentId(commentId);
+		deleteModalController.openModal();
 	}
 
 	// Edit comment
@@ -263,7 +281,7 @@ function Comment({ user, comments, reload, SERVER_POSTS_ID_URL }) {
 													<button
 														className="btn btn-danger btn-sm"
 														onClick={() =>
-															deleteComment(
+															openDeleteModal(
 																comment.id
 															)
 														}
@@ -279,6 +297,12 @@ function Comment({ user, comments, reload, SERVER_POSTS_ID_URL }) {
 					})}
 				</div>
 			)}
+
+			<ConfirmModal
+				modalController={deleteModalController}
+				onConfirm={deleteComment}
+				message="Are you sure you want to remove this comment? This action cannot be undone."
+			/>
 		</div>
 	);
 }
