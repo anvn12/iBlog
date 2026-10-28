@@ -17,16 +17,14 @@ const customStyles = {
 
 
 function UserModal({
-    modalTitle = "New Post",
-    isOpen = false,
-    setIsOpen,
-    profile = {},
+    modalController,
+    originalProfile = {},
     targetFunction,
     validationErrors
 }) {
-    const [username, setUsername] = useState(profile.username || "");
-    const [name, setName] = useState(profile.name || "");
-    const [email, setEmail] = useState(profile.email || "");
+    const [username, setUsername] = useState(originalProfile.username || "");
+    const [name, setName] = useState(originalProfile.name || "");
+    const [email, setEmail] = useState(originalProfile.email || "");
 
     function handleChangeUsername(event) {
         setUsername(event.target.value);
@@ -50,20 +48,15 @@ function UserModal({
     }
 
 
-    function closeModal() {
-        setIsOpen(false);
-    }
-
-
     return (
         <Modal
-            isOpen={isOpen}
-            onRequestClose={closeModal}
+            isOpen={modalController.isOpen}
+            onRequestClose={modalController.closeModal}
             style={customStyles}
-            contentLabel="Post Modal"
+            contentLabel="User Modal"
         >
             <div>
-                <h2>{modalTitle}</h2>
+                <h2>{modalController.title}</h2>
             </div>
 
             <div>
@@ -113,7 +106,8 @@ function UserModal({
                     onClick={() => targetFunction(username, name, email)}>
                     Save
                 </button>
-                <button onClick={closeModal}>Cancel</button>
+
+                <button onClick={() => modalController.closeModal()}>Cancel</button>
             </div>
         </Modal>
     )

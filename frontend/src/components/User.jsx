@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router";
 import AuthContext from "../context/AuthContext";
 
 import UserModal from "./UserModal";
+import ModalController from "./ModalController";
 
 
 const USERS_URL = import.meta.env.VITE_SERVER_URL + "/users";
@@ -11,9 +12,9 @@ const USERS_URL = import.meta.env.VITE_SERVER_URL + "/users";
 function User() {
     const params = useParams();
     const userId = params.id;
+    const USER_ID_URL = `${USERS_URL}/${userId}`
 
     const user = useContext(AuthContext);
-
 
     const [reloadUser, setReloadUser] = useState(false); // change this var to reload
     const [displayUser, setdisplayUser] = useState(null);
@@ -22,9 +23,8 @@ function User() {
     // Fetch user
     useEffect(() => {
         async function fetchUser() {
-            const TARGET_URL = USERS_URL + '/' + userId;
             try {
-                const res = await fetch(TARGET_URL);
+                const res = await fetch(USER_ID_URL);
                 const result = await res.json();
 
                 setdisplayUser(result.user);
@@ -34,22 +34,18 @@ function User() {
         }
 
         fetchUser();
-    }, [userId, reloadUser]);
+    }, [USER_ID_URL, reloadUser]);
 
 
     // edit user profile
+    const [modalIsOpen, setModalIsOpen] = useState(false);
     const [validationErrors, setValidationErrors] = useState([]);
-    const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+    const modalController = new ModalController("Edit Profile", modalIsOpen, setModalIsOpen)
 
-    function showEditUserModal() {
-        setIsUserModalOpen(true);
-    }
 
     async function editUser(username, name, email) {
-        const TARGET_URL = USERS_URL + '/' + userId;
-
         try {
-            const res = await fetch(TARGET_URL, {
+            const res = await fetch(USER_ID_URL, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -72,7 +68,7 @@ function User() {
             }
 
             setValidationErrors([]);
-            setIsUserModalOpen(false);
+            modalController.closeModal()
 
             reload();
         } catch (err) {
@@ -80,13 +76,16 @@ function User() {
         }
     }
 
-    if (!displayUser) {
-        return <></>
-    }
 
     function reload() {
         setReloadUser(!reloadUser)
     }
+
+
+    if (!displayUser) {
+        return <></>
+    }
+
 
     return (
         <main className="container">
@@ -99,7 +98,12 @@ function User() {
 
                 <div>
                     {(user.profile && user.profile.id === displayUser.id) && (
-                        <button onClick={showEditUserModal}>Edit</button>
+                        <button onClick={() => {
+                            setValidationErrors([]);
+                            modalController.openModal()
+                        }}>
+                            Edit
+                        </button>
                     )}
                 </div>
 
@@ -110,10 +114,8 @@ function User() {
 
             <div>
                 <UserModal
-                    modalTitle="Edit Profile"
-                    isOpen={isUserModalOpen}
-                    setIsOpen={setIsUserModalOpen}
-                    profile={displayUser}
+                    modalController={modalController}
+                    originalProfile={displayUser}
                     targetFunction={editUser}
                     validationErrors={validationErrors}
                 />

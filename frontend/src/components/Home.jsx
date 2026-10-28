@@ -3,14 +3,14 @@ import AuthContext from "../context/AuthContext";
 import { Link, useNavigate } from "react-router";
 
 import PostModal from "./PostModal";
-
+import ModalController from "./ModalController";
 
 
 const POSTS_URL = import.meta.env.VITE_SERVER_URL + "/posts";
 
+
 function Home() {
 	const user = useContext(AuthContext);
-
 	const navigate = useNavigate();
 
 
@@ -34,24 +34,16 @@ function Home() {
 
 
 	// New post modal
+	const [modalIsOpen, setModalIsOpen] = useState(false);
 	const [validationErrors, setValidationErrors] = useState([]);
-	const [isPostModalOpen, setIsPostModalOpen] = useState(false);
-	const [postTitle, setPostTitle] = useState("");
-	const [postContent, setPostContent] = useState("");
-	const [published, setPublished] = useState(true);
+	const modalController = new ModalController("New Post", modalIsOpen, setModalIsOpen)
 
-	function openNewPostModal() {
-		setValidationErrors([]);
+	// const [postTitle, setPostTitle] = useState("");
+	// const [postContent, setPostContent] = useState("");
+	// const [published, setPublished] = useState(true);
 
-		if (!user?.JWT) {
-			navigate('/login');
-			return;
-		}
 
-		setIsPostModalOpen(true);
-	}
-
-	async function createNewPost() {
+	async function createNewPost(title, content, published) {
 		setValidationErrors([]);
 
 		try {
@@ -62,8 +54,8 @@ function Home() {
 					"Authorization": `Bearer ${user.JWT}`
 				},
 				body: JSON.stringify({
-					title: postTitle.trim(),
-					content: postContent.trim() || "",
+					title: title.trim(),
+					content: content.trim() || "",
 					published
 				}),
 			});
@@ -77,15 +69,10 @@ function Home() {
 				return;
 			}
 
-			setPostTitle("");
-			setPostContent("");
-			setPublished(true);
 			setValidationErrors([]);
+			modalController.closeModal()
 
 			setReloadPost(!reloadPost);
-
-			// close modal
-			setIsPostModalOpen(false);
 		} catch (err) {
 			console.error(err);
 		}
@@ -98,7 +85,12 @@ function Home() {
 				<h1>Latest Posts</h1>
 				<p>Discover stories from our community</p>
 
-				<button onClick={openNewPostModal}>New Post</button>
+				<button onClick={() => {
+					setValidationErrors([]);
+					modalController.openModal()
+				}}>
+					New Post
+				</button>
 			</div>
 
 			<div className="posts-grid">
@@ -134,15 +126,8 @@ function Home() {
 
 			<div>
 				<PostModal
-					modalTitle="New Post"
-					isOpen={isPostModalOpen}
-					setIsOpen={setIsPostModalOpen}
-					postTitle={postTitle}
-					postContent={postContent}
-					published={published}
-					setPostTitle={setPostTitle}
-					setPostContent={setPostContent}
-					setPublished={setPublished}
+					modalController={modalController}
+					originalPost={{}}
 					targetFunction={createNewPost}
 					validationErrors={validationErrors}
 				/>
