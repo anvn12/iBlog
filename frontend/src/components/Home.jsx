@@ -38,9 +38,14 @@ function Home() {
 		setModalIsOpen
 	);
 
-	// const [postTitle, setPostTitle] = useState("");
-	// const [postContent, setPostContent] = useState("");
-	// const [published, setPublished] = useState(true);
+	function openNewPostModal() {
+		if (!user.JWT) {
+			navigate("/login");
+		}
+
+		setValidationErrors([]);
+		modalController.openModal();
+	}
 
 	async function createNewPost(title, content, published) {
 		setValidationErrors([]);
@@ -83,14 +88,7 @@ function Home() {
 				<h1>Latest Posts</h1>
 				<p>Discover stories from our community</p>
 
-				<button
-					onClick={() => {
-						setValidationErrors([]);
-						modalController.openModal();
-					}}
-				>
-					New Post
-				</button>
+				<button onClick={openNewPostModal}>New Post</button>
 			</div>
 
 			<div className="posts-grid">
