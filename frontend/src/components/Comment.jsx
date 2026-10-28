@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
+import { toast } from "react-toastify";
 
 function Comment({ user, comments, reload, SERVER_POSTS_ID_URL }) {
 	const [commentContent, setCommentContent] = useState("");
@@ -42,6 +43,7 @@ function Comment({ user, comments, reload, SERVER_POSTS_ID_URL }) {
 			}
 
 			reload();
+			toast.success("Successfully posted comment");
 			setCommentContent("");
 		} catch (err) {
 			console.error(err);
@@ -64,6 +66,7 @@ function Comment({ user, comments, reload, SERVER_POSTS_ID_URL }) {
 				return;
 			}
 
+			toast.success("Successfully deleted comment");
 			reload();
 		} catch (err) {
 			console.error(err);
@@ -120,6 +123,7 @@ function Comment({ user, comments, reload, SERVER_POSTS_ID_URL }) {
 
 			setValidationEditingCommentErrors([]);
 			closeEditingComment();
+			toast.success("Successfully updated comment");
 			reload();
 		} catch (err) {
 			console.error(err);
@@ -131,7 +135,7 @@ function Comment({ user, comments, reload, SERVER_POSTS_ID_URL }) {
 		return validationErrors
 			.filter((error) => error.path === fieldName)
 			.map((error, i) => (
-				<p key={i} role="alert" style={{ color: "red" }}>
+				<p key={i} className="error-message">
 					{error.msg}
 				</p>
 			));
@@ -141,124 +145,139 @@ function Comment({ user, comments, reload, SERVER_POSTS_ID_URL }) {
 		return validationEditingCommentErrors
 			.filter((error) => error.path === fieldName)
 			.map((error, i) => (
-				<p key={i} role="alert" style={{ color: "red" }}>
+				<p key={i} className="error-message">
 					{error.msg}
 				</p>
 			));
 	}
 
 	return (
-		<div>
-			<div>
-				<h2>Comments</h2>
-			</div>
+		<div className="comments-section">
+			<h2>Comments</h2>
 
 			<div>
 				{user.profile ? (
-					<form onSubmit={postNewComment}>
-						{getFieldError("content")}
-						<input
-							type="text"
-							name="content"
-							value={commentContent}
-							onChange={handleChangeCommentContent}
-							placeholder="Comment"
-						/>
+					<form className="comment-form" onSubmit={postNewComment}>
+						<div className="input-wrapper">
+							{getFieldError("content")}
+							<input
+								type="text"
+								name="content"
+								value={commentContent}
+								onChange={handleChangeCommentContent}
+								placeholder="Write a comment..."
+							/>
+						</div>
 
-						{commentContent && <button type="submit">Post</button>}
+						{commentContent && (
+							<button
+								className="btn btn-primary comment-form-btn"
+								type="submit"
+							>
+								Post
+							</button>
+						)}
 					</form>
 				) : (
-					<p>
-						<span>
-							<Link to="/login">Log in </Link>
-						</span>
-						or
-						<span>
-							<Link to="/signup"> sign up </Link>
-						</span>
-						to comment
+					<p className="comment-login-prompt">
+						<Link to="/login">Log in</Link> or{" "}
+						<Link to="/signup">sign up</Link> to comment
 					</p>
 				)}
 			</div>
 
 			{comments.length === 0 ? (
-				<div>No comments</div>
+				<div className="no-comments">No comments yet</div>
 			) : (
-				comments.map((comment) => {
-					return (
-						<div key={comment.id}>
-							<div>
-								<span>
-									<Link to={"/users/" + comment.author.id}>
+				<div className="comment-list">
+					{comments.map((comment) => {
+						return (
+							<div className="comment-item" key={comment.id}>
+								<div className="comment-header">
+									<Link
+										to={
+											"/users/" + comment.author.id
+										}
+										className="text-truncate"
+										style={{ maxWidth: '120px' }}
+									>
 										{comment.author.username}
 									</Link>
-								</span>
-								,&nbsp;
-								<span>
-									{new Date(
-										comment.updatedAt
-									).toLocaleDateString()}
-								</span>
-							</div>
-
-							{editingComment.status === true &&
-							editingComment.commentId === comment.id ? (
-								<div>
-									{getEditingCommentError("content")}
-									<input
-										type="text"
-										value={editingComment.content}
-										onChange={
-											handleChangeEditingCommentContent
-										}
-									/>
-
-									<div>
-										<button onClick={saveEditingComment}>
-											Save
-										</button>
-
-										<button onClick={closeEditingComment}>
-											Cancel
-										</button>
-									</div>
+									<span>·</span>
+									<span>
+										{new Date(
+											comment.updatedAt
+										).toLocaleDateString()}
+									</span>
 								</div>
-							) : (
-								<div>
-									<div>
-										<p>{comment.content}</p>
-									</div>
 
-									{user.profile &&
-										comment.author.id ===
+								{editingComment.status === true &&
+									editingComment.commentId === comment.id ? (
+									<div className="comment-edit-form">
+										{getEditingCommentError("content")}
+										<input
+											type="text"
+											value={editingComment.content}
+											onChange={
+												handleChangeEditingCommentContent
+											}
+										/>
+
+										<div className="comment-edit-actions">
+											<button
+												className="btn btn-primary btn-sm"
+												onClick={saveEditingComment}
+											>
+												Save
+											</button>
+
+											<button
+												className="btn btn-sm"
+												onClick={closeEditingComment}
+											>
+												Cancel
+											</button>
+										</div>
+									</div>
+								) : (
+									<div>
+										<div className="comment-body">
+											<p>{comment.content}</p>
+										</div>
+
+										{user.profile &&
+											comment.author.id ===
 											user.profile.id && (
-											<div>
-												<button
-													onClick={() =>
-														toggleEditComment(
-															comment
-														)
-													}
-												>
-													Edit
-												</button>
+												<div className="comment-actions">
+													<button
+														className="btn btn-sm"
+														onClick={() =>
+															toggleEditComment(
+																comment
+															)
+														}
+													>
+														Edit
+													</button>
 
-												<button
-													onClick={() =>
-														deleteComment(
-															comment.id
-														)
-													}
-												>
-													Remove
-												</button>
-											</div>
-										)}
-								</div>
-							)}
-						</div>
-					);
-				})
+													<button
+														className="btn btn-danger btn-sm"
+														onClick={() =>
+															deleteComment(
+																comment.id
+															)
+														}
+													>
+														Remove
+													</button>
+												</div>
+											)}
+									</div>
+								)}
+							</div>
+						);
+					})}
+				</div>
 			)}
 		</div>
 	);

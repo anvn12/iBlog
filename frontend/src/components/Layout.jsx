@@ -1,7 +1,8 @@
 import { NavLink, Outlet } from "react-router";
 import { useContext } from "react";
-
 import AuthContext from "../context/AuthContext";
+
+import { ToastContainer } from "react-toastify";
 
 function Layout() {
 	const user = useContext(AuthContext);
@@ -54,6 +55,7 @@ function Layout() {
 
 			<div id="content">
 				<Outlet />
+				<ToastContainer />
 			</div>
 
 			<footer

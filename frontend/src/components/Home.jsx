@@ -5,6 +5,8 @@ import { Link, useNavigate } from "react-router";
 import PostModal from "./PostModal";
 import ModalController from "./ModalController";
 
+import { toast } from "react-toastify";
+
 const POSTS_URL = import.meta.env.VITE_SERVER_URL + "/posts";
 
 function Home() {
@@ -76,6 +78,8 @@ function Home() {
 			setValidationErrors([]);
 			modalController.closeModal();
 
+			toast.success("Successfully created new post");
+
 			setReloadPost(!reloadPost);
 		} catch (err) {
 			console.error(err);
@@ -86,12 +90,17 @@ function Home() {
 		<main className="container">
 			<div className="page-header">
 				<h1>Latest Posts</h1>
-				<p>Discover stories from our community</p>
 
-				<button onClick={openNewPostModal}>New Post</button>
+				<button
+					className="btn btn-primary"
+					style={{ marginTop: "16px" }}
+					onClick={openNewPostModal}
+				>
+					New Post
+				</button>
 			</div>
 
-			<div className="posts-grid">
+			<div className="posts-list">
 				{posts.length === 0 ? (
 					<>
 						<p>No posts</p>
@@ -101,27 +110,39 @@ function Home() {
 						return (
 							<article className="card" key={post.id}>
 								<div className="card-body">
-									<h2 className="post-title">
-										<Link to={"/posts/" + post.id}>
-											{post.title}
-										</Link>
-									</h2>
-									<p className="post-meta">
-										<span>
-											By{" "}
+									<p
+										className="post-meta"
+										style={{
+											display: "flex",
+											alignItems: "center",
+										}}
+									>
+										<span
+											className="text-truncate"
+											style={{ maxWidth: "150px" }}
+										>
 											<Link
 												to={"/users/" + post.author.id}
 											>
 												{post.author.username}
 											</Link>
 										</span>
-										,&nbsp;
+										&nbsp;&middot;&nbsp;
 										<span>
 											{new Date(
 												post.updatedAt
 											).toLocaleDateString()}
 										</span>
 									</p>
+
+									<h2 className="post-title">
+										<Link
+											to={"/posts/" + post.id}
+											className="text-truncate"
+										>
+											{post.title}
+										</Link>
+									</h2>
 								</div>
 							</article>
 						);
@@ -129,14 +150,12 @@ function Home() {
 				)}
 			</div>
 
-			<div>
-				<PostModal
-					modalController={modalController}
-					originalPost={{}}
-					targetFunction={createNewPost}
-					validationErrors={validationErrors}
-				/>
-			</div>
+			<PostModal
+				modalController={modalController}
+				originalPost={{}}
+				targetFunction={createNewPost}
+				validationErrors={validationErrors}
+			/>
 		</main>
 	);
 }

@@ -85,39 +85,55 @@ function User() {
 
 	return (
 		<main className="container">
-			<div>
-				<div>
-					<p>Username: {displayUser.username || "Null"}</p>
-					<p>Name: {displayUser.name || "Null"}</p>
-					<p>Email: {displayUser.email || "Null"}</p>
-				</div>
+			<div className="user-profile">
+				<div className="user-profile-card">
+					<div className="user-profile-info">
+						<p>
+							<span className="user-profile-label">
+								Username:
+							</span>
+							{displayUser.username || "Not set"}
+						</p>
+						<p>
+							<span className="user-profile-label">Name:</span>
+							{displayUser.name || "Not set"}
+						</p>
+						<p>
+							<span className="user-profile-label">Email:</span>
+							{displayUser.email || "Not set"}
+						</p>
+					</div>
 
-				<div>
-					{user.profile && user.profile.id === displayUser.id && (
-						<button
-							onClick={() => {
-								setValidationErrors([]);
-								modalController.openModal();
-							}}
+					<div className="user-profile-actions">
+						{user.profile &&
+							user.profile.id === displayUser.id && (
+								<button
+									className="btn btn-primary btn-sm"
+									onClick={() => {
+										setValidationErrors([]);
+										modalController.openModal();
+									}}
+								>
+									Edit Profile
+								</button>
+							)}
+
+						<Link
+							to={"/users/" + userId + "/posts"}
+							className="btn btn-outline btn-sm"
 						>
-							Edit
-						</button>
-					)}
-				</div>
-
-				<div>
-					<Link to={"/users/" + userId + "/posts"}>View posts</Link>
+							View Posts
+						</Link>
+					</div>
 				</div>
 			</div>
 
-			<div>
-				<UserModal
-					modalController={modalController}
-					originalProfile={displayUser}
-					targetFunction={editUser}
-					validationErrors={validationErrors}
-				/>
-			</div>
+			<UserModal
+				modalController={modalController}
+				originalProfile={displayUser}
+				targetFunction={editUser}
+				validationErrors={validationErrors}
+			/>
 		</main>
 	);
 }

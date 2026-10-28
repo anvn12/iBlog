@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import Modal from "react-modal";
 
@@ -27,7 +27,21 @@ function PostModal({
 
 	const [title, setTitle] = useState(originalPost.title || "");
 	const [content, setContent] = useState(originalPost.content || "");
-	const [published, setPublished] = useState(originalPost.published || true);
+	const [published, setPublished] = useState(
+		originalPost.published !== undefined ? originalPost.published : true
+	);
+
+	useEffect(() => {
+		if (modalController.isOpen) {
+			setTitle(originalPost.title || "");
+			setContent(originalPost.content || "");
+			setPublished(
+				originalPost.published !== undefined
+					? originalPost.published
+					: true
+			);
+		}
+	}, [modalController.isOpen, originalPost]);
 
 	function handleChangeTitle(event) {
 		setTitle(event.target.value);
@@ -43,7 +57,7 @@ function PostModal({
 		return validationErrors
 			.filter((error) => error.path === fieldName)
 			.map((error, i) => (
-				<p key={i} role="alert" style={{ color: "red" }}>
+				<p key={i} className="error-message">
 					{error.msg}
 				</p>
 			));
@@ -56,17 +70,17 @@ function PostModal({
 			style={customStyles}
 			contentLabel="Post Modal"
 		>
-			<div>
+			<div className="modal-header">
 				<h2>{modalController.title}</h2>
 			</div>
 
-			<div>
-				<div>
+			<div className="modal-body">
+				<div className="modal-field">
 					{getFieldError("title")}
-					<label htmlFor="title">Title: </label>
+					<label htmlFor="title">Title</label>
 					<input
 						type="text"
-						placeholder="Title"
+						placeholder="Enter post title"
 						name="title"
 						id="title"
 						value={title}
@@ -74,7 +88,7 @@ function PostModal({
 					/>
 				</div>
 
-				<div>
+				<div className="modal-field">
 					<Editor
 						apiKey={TINYMCE_API}
 						onInit={(evt, editor) => (editorRef.current = editor)}
@@ -116,8 +130,8 @@ function PostModal({
 					/>
 				</div>
 
-				<div>
-					<label htmlFor="published">Is published: </label>
+				<div className="modal-field">
+					<label htmlFor="published">Published</label>
 					<select
 						name="published"
 						id="published"
@@ -130,9 +144,16 @@ function PostModal({
 				</div>
 			</div>
 
-			<div>
+			<div className="modal-footer">
+				<button
+					className="btn btn-secondary"
+					onClick={() => modalController.closeModal()}
+				>
+					Cancel
+				</button>
 				{title.length === 0 ? (
 					<button
+						className="btn btn-primary"
 						onClick={() =>
 							targetFunction(title, content, published)
 						}
@@ -142,6 +163,7 @@ function PostModal({
 					</button>
 				) : (
 					<button
+						className="btn btn-primary"
 						onClick={() =>
 							targetFunction(title, content, published)
 						}
@@ -149,10 +171,6 @@ function PostModal({
 						Post
 					</button>
 				)}
-
-				<button onClick={() => modalController.closeModal()}>
-					Cancel
-				</button>
 			</div>
 		</Modal>
 	);

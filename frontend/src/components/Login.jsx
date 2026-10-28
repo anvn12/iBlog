@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
+import { toast } from "react-toastify";
 import AuthContext from "../context/AuthContext";
 
 const LOGIN_URL = import.meta.env.VITE_SERVER_URL + "/auth/login";
@@ -58,6 +59,7 @@ function Login() {
 
 			if (result.token) {
 				user.changeJWT(result.token);
+				toast.success("Successfully logged in");
 				navigate("/");
 			} else {
 				setError("Invalid response received from server.");
@@ -150,7 +152,7 @@ function Login() {
 						</button>
 					</form>
 				</div>
-				<div>
+				<div className="auth-card-footer">
 					<span>Or create a new account?</span>
 					&nbsp;
 					<Link to="/signup">Sign up</Link>

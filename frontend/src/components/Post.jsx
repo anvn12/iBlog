@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { useParams, Link, useNavigate } from "react-router";
+import { toast } from "react-toastify";
 import AuthContext from "../context/AuthContext";
 import parse from "html-react-parser";
 import DOMPurify from "dompurify";
@@ -51,6 +52,7 @@ function Post() {
 				return;
 			}
 
+			toast.success("Successfully deleted post");
 			navigate("/");
 		} catch (err) {
 			console.error(err);
@@ -93,6 +95,8 @@ function Post() {
 			setValidationErrors([]);
 			modalController.closeModal();
 
+			toast.success("Successfully edited post");
+
 			reload();
 		} catch (err) {
 			console.error(err);
@@ -109,31 +113,40 @@ function Post() {
 
 	return (
 		<main className="container">
-			<div>
-				<h1>{post.title && post.title}</h1>
+			<div className="post-detail">
+				<div className="post-detail-header">
+					<h1>{post.title && post.title}</h1>
 
-				<div>
-					<p>
-						Author: &nbsp;
-						<Link to={"/users/" + post.author.id}>
-							{post.author && post.author.username}
-						</Link>
-					</p>
-
-					<p>
-						{post.createdAt &&
-							"Created at: " +
-								new Date(post.createdAt).toLocaleDateString()}
-						&nbsp;
-						{post.updatedAt &&
-							"Updated at: " +
-								new Date(post.updatedAt).toLocaleDateString()}
-					</p>
+					<div className="post-detail-meta">
+						<span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+							By{" "}
+							<Link to={"/users/" + post.author.id} className="text-truncate" style={{ maxWidth: '200px' }}>
+								{post.author && post.author.username}
+							</Link>
+						</span>
+						{post.createdAt && (
+							<span>
+								Created{" "}
+								{new Date(
+									post.createdAt
+								).toLocaleDateString()}
+							</span>
+						)}
+						{post.updatedAt && (
+							<span>
+								Updated{" "}
+								{new Date(
+									post.updatedAt
+								).toLocaleDateString()}
+							</span>
+						)}
+					</div>
 				</div>
 
 				{user.profile && post.author.id === user.profile.id && (
-					<div>
+					<div className="post-detail-actions">
 						<button
+							className="btn btn-primary btn-sm"
 							onClick={() => {
 								setValidationErrors([]);
 								modalController.openModal();
@@ -142,17 +155,20 @@ function Post() {
 							Edit
 						</button>
 
-						<button onClick={deletePost}>Remove</button>
+						<button
+							className="btn btn-danger btn-sm"
+							onClick={deletePost}
+						>
+							Remove
+						</button>
 					</div>
 				)}
 
-				<div>
-					{post.content && (
-						<div className="post-content">
-							{parse(DOMPurify.sanitize(post.content))}
-						</div>
-					)}
-				</div>
+				{post.content && (
+					<div className="post-content">
+						{parse(DOMPurify.sanitize(post.content))}
+					</div>
+				)}
 			</div>
 
 			<Comment
@@ -162,14 +178,12 @@ function Post() {
 				SERVER_POSTS_ID_URL={SERVER_POSTS_ID_URL}
 			/>
 
-			<div>
-				<PostModal
-					modalController={modalController}
-					originalPost={post}
-					targetFunction={editPost}
-					validationErrors={validationErrors}
-				/>
-			</div>
+			<PostModal
+				modalController={modalController}
+				originalPost={post}
+				targetFunction={editPost}
+				validationErrors={validationErrors}
+			/>
 		</main>
 	);
 }

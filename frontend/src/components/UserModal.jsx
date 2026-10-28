@@ -38,7 +38,7 @@ function UserModal({
 		return validationErrors
 			.filter((error) => error.path === fieldName)
 			.map((error, i) => (
-				<p key={i} role="alert" style={{ color: "red" }}>
+				<p key={i} className="error-message">
 					{error.msg}
 				</p>
 			));
@@ -51,17 +51,17 @@ function UserModal({
 			style={customStyles}
 			contentLabel="User Modal"
 		>
-			<div>
+			<div className="modal-header">
 				<h2>{modalController.title}</h2>
 			</div>
 
-			<div>
-				<div>
+			<div className="modal-body">
+				<div className="modal-field">
 					{getFieldError("username")}
-					<label htmlFor="username">Username: </label>
+					<label htmlFor="username">Username</label>
 					<input
 						type="text"
-						placeholder="username"
+						placeholder="Username"
 						name="username"
 						id="username"
 						value={username}
@@ -69,12 +69,12 @@ function UserModal({
 					/>
 				</div>
 
-				<div>
+				<div className="modal-field">
 					{getFieldError("name")}
-					<label htmlFor="name">Name: </label>
+					<label htmlFor="name">Name</label>
 					<input
 						type="text"
-						placeholder="name"
+						placeholder="Name"
 						name="name"
 						id="name"
 						value={name}
@@ -82,12 +82,12 @@ function UserModal({
 					/>
 				</div>
 
-				<div>
+				<div className="modal-field">
 					{getFieldError("email")}
-					<label htmlFor="email">Email: </label>
+					<label htmlFor="email">Email</label>
 					<input
 						type="email"
-						placeholder="email"
+						placeholder="Email"
 						name="email"
 						id="email"
 						value={email}
@@ -96,16 +96,19 @@ function UserModal({
 				</div>
 			</div>
 
-			<div>
+			<div className="modal-footer">
 				<button
+					className="btn btn-secondary"
+					onClick={() => modalController.closeModal()}
+				>
+					Cancel
+				</button>
+				<button
+					className="btn btn-primary"
 					type="submit"
 					onClick={() => targetFunction(username, name, email)}
 				>
 					Save
-				</button>
-
-				<button onClick={() => modalController.closeModal()}>
-					Cancel
 				</button>
 			</div>
 		</Modal>

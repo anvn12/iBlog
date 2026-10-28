@@ -46,65 +46,78 @@ function UserPosts() {
 
 	return (
 		<main className="container">
-			<div>
-				<Link to={"/users/" + userId}>Back to User Profile</Link>
-			</div>
-			<div>
-				<div>
-					{published === "true" ? (
-						user.profile &&
-						user.profile.id === userId && (
-							<Link to={{ search: "?published=false" }}>
-								Show unpublished posts
-							</Link>
-						)
-					) : (
-						<Link to={{ search: "?published=true" }}>
-							Show published posts
-						</Link>
-					)}
-				</div>
-				<div>
-					<table>
-						<thead>
-							<tr>
-								<th>Title</th>
-								<th>Updated At</th>
-								<th>Created At</th>
-							</tr>
-						</thead>
+			<div className="user-posts">
+				<div className="user-posts-nav">
+					<Link to={"/users/" + userId}>
+						← Back to Profile
+					</Link>
 
-						<tbody>
-							{displayPosts.length === 0 ? (
-								<tr>
-									<td colSpan="3">No posts</td>
-								</tr>
-							) : (
-								displayPosts.map((post) => {
-									return (
-										<tr key={post.id}>
-											<td>
-												<Link to={"/posts/" + post.id}>
-													{post.title}
-												</Link>
-											</td>
-											<td>
-												{new Date(
-													post.updatedAt
-												).toLocaleDateString()}
-											</td>
-											<td>
-												{new Date(
-													post.createdAt
-												).toLocaleDateString()}
-											</td>
-										</tr>
-									);
-								})
-							)}
-						</tbody>
-					</table>
+					<div>
+						{published === "true" ? (
+							user.profile &&
+							user.profile.id === userId && (
+								<Link
+									className="btn btn-outline btn-sm"
+									to={{ search: "?published=false" }}
+								>
+									Show Unpublished
+								</Link>
+							)
+						) : (
+							<Link
+								className="btn btn-outline btn-sm"
+								to={{ search: "?published=true" }}
+							>
+								Show Published
+							</Link>
+						)}
+					</div>
 				</div>
+
+				<table>
+					<thead>
+						<tr>
+							<th>Title</th>
+							<th>Updated At</th>
+							<th>Created At</th>
+						</tr>
+					</thead>
+
+					<tbody>
+						{displayPosts.length === 0 ? (
+							<tr>
+								<td colSpan="3" className="no-comments">
+									No posts
+								</td>
+							</tr>
+						) : (
+							displayPosts.map((post) => {
+								return (
+									<tr key={post.id}>
+										<td style={{ maxWidth: '300px' }}>
+											<Link
+												to={"/posts/" + post.id}
+												className="text-truncate"
+											>
+												{post.title}
+											</Link>
+										</td>
+										<td>
+											{new Date(
+												post.updatedAt
+											).toLocaleDateString()}
+										</td>
+										<td>
+											{new Date(
+												post.createdAt
+											).toLocaleDateString()}
+										</td>
+									</tr>
+								);
+							})
+						)}
+					</tbody>
+				</table>
 			</div>
 		</main>
 	);

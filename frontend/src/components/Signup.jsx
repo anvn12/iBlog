@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router";
+import { toast } from "react-toastify";
 import AuthContext from "../context/AuthContext";
 
 const SIGNUP_URL = import.meta.env.VITE_SERVER_URL + "/auth/signup";
@@ -71,6 +72,7 @@ function Signup() {
 
 			if (result.token) {
 				user.changeJWT(result.token);
+				toast.success("Successfully signed up");
 				navigate("/");
 			} else {
 				setError("Invalid response received from server.");
@@ -87,7 +89,7 @@ function Signup() {
 		return validationErrors
 			.filter((err) => err.path === fieldName)
 			.map((err, i) => (
-				<p key={i} role="alert" style={{ color: "red" }}>
+				<p key={i} className="error-message">
 					{err.msg}
 				</p>
 			));
@@ -173,8 +175,8 @@ function Signup() {
 						</button>
 					</form>
 				</div>
-				<div>
-					<span>Already has an account?</span>
+				<div className="auth-card-footer">
+					<span>Already have an account?</span>
 					&nbsp;
 					<Link to="/login">Log in</Link>
 				</div>
