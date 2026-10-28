@@ -105,7 +105,7 @@ async function getUserPosts(req, res, next) {
 		if (published === false) {
 			// verify if current user is the target user
 			const currentUser = req.user.user;
-			if (currentUser.id !== user.id) {
+			if (!currentUser || currentUser.id !== user.id) {
 				return res.status(403).json({
 					error: "User is not authorized",
 				});
