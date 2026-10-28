@@ -6,7 +6,10 @@ const SECRET_KEY = process.env.SECRET_KEY;
 // get user data from jwt
 async function getUserFromJWT(req, res, next) {
 	const authHeader = req.headers.authorization;
-	const token = authHeader && authHeader.startsWith("Bearer ") ? authHeader.split(" ")[1] : null;
+	const token =
+		authHeader && authHeader.startsWith("Bearer ")
+			? authHeader.split(" ")[1]
+			: null;
 	if (!token) {
 		req.user = null;
 		return next();
