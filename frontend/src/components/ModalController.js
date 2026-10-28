@@ -8,15 +8,11 @@ class ModalController {
 	openModal() {
 		this.isOpen = true;
 		this.setIsOpen(true);
-
-		console.log("open modal");
 	}
 
 	closeModal() {
 		this.isOpen = false;
 		this.setIsOpen(false);
-
-		console.log("close modal");
 	}
 }
 
