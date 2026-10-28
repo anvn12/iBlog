@@ -40,11 +40,11 @@ const userUpdateValidator = [
         .withMessage('Must be a valid email')
         .normalizeEmail(),
 
-    body('name')
-        .optional()
-        .trim()
-        .notEmpty()
-        .withMessage('Name cannot be empty')
+    // body('name')
+    //     .optional()
+    //     .trim()
+    //     .notEmpty()
+    //     .withMessage('Name cannot be empty')
 ]
 const updateUserProfile = [
     userUpdateValidator,

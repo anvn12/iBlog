@@ -66,7 +66,6 @@ function PostModal({
             contentLabel="Post Modal"
         >
             <div>
-                <button onClick={closeModal}>Cancel</button>
                 <h2>{modalTitle}</h2>
             </div>
 
@@ -123,11 +122,14 @@ function PostModal({
                 </div>
             </div>
 
-            {postTitle.length === 0 ? (
-                <button onClick={targetFunction} disabled>Post</button>
-            ) : (
-                <button onClick={targetFunction}>Post</button>
-            )}
+            <div>
+                {postTitle.length === 0 ? (
+                    <button onClick={targetFunction} disabled>Post</button>
+                ) : (
+                    <button onClick={targetFunction}>Post</button>
+                )}
+                <button onClick={closeModal}>Cancel</button>
+            </div>
         </Modal>
     )
 }
