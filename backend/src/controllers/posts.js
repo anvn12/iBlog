@@ -110,11 +110,15 @@ const updatePost = [
 			const newData = {
 				title: req.body.title?.trim(),
 				content: req.body.content?.trim() || null,
-				published:
-					req.body.published === true ||
-					req.body.published === "true" ||
-					false,
 			};
+
+			// only change `published` when the client explicitly sent it,
+			// otherwise a partial update would silently unpublish the post
+			if (req.body.published !== undefined) {
+				newData.published =
+					req.body.published === true ||
+					req.body.published === "true";
+			}
 
 			// update post in db
 			const updatedPost = await db.updatePost(postId, newData);
