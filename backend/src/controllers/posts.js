@@ -65,6 +65,12 @@ async function getPost(req, res, next) {
 			return next();
 		}
 
+		// Unpublished posts are only visible to their author
+		const currentUser = req.user?.user;
+		if (!post.published && currentUser?.id !== post.authorId) {
+			return next();
+		}
+
 		res.json({
 			message: "Get post details",
 			post,

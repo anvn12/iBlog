@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const { authenticateToken } = require("../utils/jwt");
+const getUserFromJWT = require("../middlewares/getUserFromJWT");
 const postsController = require("../controllers/posts");
 const commentsController = require("../controllers/comments");
 
@@ -10,7 +11,8 @@ router.get("/", postsController.getPosts);
 router.post("/", authenticateToken, postsController.createPost);
 
 // /posts/:id
-router.get("/:id", postsController.getPost);
+// getUserFromJWT is optional: it lets the author read their own unpublished post
+router.get("/:id", getUserFromJWT, postsController.getPost);
 router.put("/:id", authenticateToken, postsController.updatePost);
 router.delete("/:id", authenticateToken, postsController.deletePost);
 
