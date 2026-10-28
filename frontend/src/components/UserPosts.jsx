@@ -11,6 +11,7 @@ function UserPosts() {
 
     const params = useParams();
     const userId = params.id;
+    const USER_ID_URL = `${USERS_URL}/${userId}`
 
     const [searchParams] = useSearchParams();
     const published = searchParams.get("published") || "true";
@@ -22,7 +23,7 @@ function UserPosts() {
     // Fetch user posts
     useEffect(() => {
         async function fetchUser() {
-            const TARGET_URL = USERS_URL + '/' + userId + "/posts?published=" + published;
+            const TARGET_URL = USER_ID_URL + "/posts?published=" + published;
             try {
                 const res = await fetch(TARGET_URL, {
                     method: "GET",
@@ -41,7 +42,7 @@ function UserPosts() {
         }
 
         fetchUser();
-    }, [userId, published, user.JWT]);
+    }, [USER_ID_URL, published, user.JWT]);
 
 
     if (!displayPosts) {
@@ -51,48 +52,53 @@ function UserPosts() {
     return (
         <main className="container">
             <div>
-                {published === "true" ? (
-                    (user.profile && user.profile.id === userId) && (
-                        <Link to={{ search: "?published=false" }}>
-                            Show unpublished posts
-                        </Link>
-                    )
-                ) : (
-                    <Link to={{ search: "?published=true" }}>Show published posts</Link>
-                )}
+                <Link to={"/users/" + userId}>Back to User Profile</Link>
             </div>
             <div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Updated At</th>
-                            <th>Created At</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {displayPosts.length === 0 ? (
+                <div>
+                    {published === "true" ? (
+                        (user.profile && user.profile.id === userId) && (
+                            <Link to={{ search: "?published=false" }}>
+                                Show unpublished posts
+                            </Link>
+                        )
+                    ) : (
+                        <Link to={{ search: "?published=true" }}>Show published posts</Link>
+                    )}
+                </div>
+                <div>
+                    <table>
+                        <thead>
                             <tr>
-                                <td colSpan="3">No posts</td>
+                                <th>Title</th>
+                                <th>Updated At</th>
+                                <th>Created At</th>
                             </tr>
-                        ) : (
-                            displayPosts.map(post => {
-                                return (
-                                    <tr key={post.id}>
-                                        <td>
-                                            <Link to={"/posts/" + post.id}>
-                                                {post.title}
-                                            </Link>
-                                        </td>
-                                        <td>{new Date(post.updatedAt).toLocaleDateString()}</td>
-                                        <td>{new Date(post.createdAt).toLocaleDateString()}</td>
-                                    </tr>
-                                )
-                            })
-                        )}
-                    </tbody>
-                </table>
+                        </thead>
+
+                        <tbody>
+                            {displayPosts.length === 0 ? (
+                                <tr>
+                                    <td colSpan="3">No posts</td>
+                                </tr>
+                            ) : (
+                                displayPosts.map(post => {
+                                    return (
+                                        <tr key={post.id}>
+                                            <td>
+                                                <Link to={"/posts/" + post.id}>
+                                                    {post.title}
+                                                </Link>
+                                            </td>
+                                            <td>{new Date(post.updatedAt).toLocaleDateString()}</td>
+                                            <td>{new Date(post.createdAt).toLocaleDateString()}</td>
+                                        </tr>
+                                    )
+                                })
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </main>
     );

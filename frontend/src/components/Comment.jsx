@@ -158,7 +158,9 @@ function Comment({
 
     return (
         <div>
-            <h2>Comments</h2>
+            <div>
+                <h2>Comments</h2>
+            </div>
 
             <div>
                 {user.profile ? (
@@ -177,70 +179,81 @@ function Comment({
                         )}
                     </form>
                 ) : (
-                    <p>Log in or sign up to comment</p>
+                    <p>
+                        <span>
+                            <Link to="/login">Log in </Link>
+                        </span>
+                        or
+                        <span>
+                            <Link to="/signup"> sign up </Link>
+                        </span>
+                        to comment
+                    </p>
                 )}
             </div>
 
-
-            {comments && comments.map(comment => {
-                return (
-                    <div key={comment.id}>
-                        <div>
-                            <span>
-                                <Link to={"/users/" + comment.author.id}>{comment.author.username}</Link>
-                            </span>
-
-                            ,&nbsp;
-
-                            <span>
-                                {(new Date(comment.updatedAt).toLocaleDateString())}
-                            </span>
-                        </div>
-
-                        {(editingComment.status === true &&
-                            editingComment.commentId === comment.id) ? (
-
+            {comments.length === 0 ? (
+                <div>No comments</div>
+            ) : (
+                comments.map(comment => {
+                    return (
+                        <div key={comment.id}>
                             <div>
-                                {getEditingCommentError("content")}
+                                <span>
+                                    <Link to={"/users/" + comment.author.id}>{comment.author.username}</Link>
+                                </span>
 
-                                <input
-                                    type="text"
-                                    value={editingComment.content}
-                                    onChange={handleChangeEditingCommentContent}
-                                />
+                                ,&nbsp;
 
-                                <div>
-                                    <button onClick={saveEditingComment}>
-                                        Save
-                                    </button>
-
-                                    <button onClick={closeEditingComment}>
-                                        Cancel
-                                    </button>
-                                </div>
+                                <span>
+                                    {(new Date(comment.updatedAt).toLocaleDateString())}
+                                </span>
                             </div>
-                        ) : (
-                            <div>
-                                <div>
-                                    <p>{comment.content}</p>
-                                </div>
 
-                                {(user.profile && comment.author.id === user.profile.id) &&
+                            {(editingComment.status === true &&
+                                editingComment.commentId === comment.id) ? (
+
+                                <div>
+                                    {getEditingCommentError("content")}
+                                    <input
+                                        type="text"
+                                        value={editingComment.content}
+                                        onChange={handleChangeEditingCommentContent}
+                                    />
+
                                     <div>
-                                        <button onClick={() => toggleEditComment(comment)}>
-                                            Edit
+                                        <button onClick={saveEditingComment}>
+                                            Save
                                         </button>
 
-                                        <button onClick={() => deleteComment(comment.id)}>
-                                            Remove
+                                        <button onClick={closeEditingComment}>
+                                            Cancel
                                         </button>
                                     </div>
-                                }
-                            </div>
-                        )}
-                    </div>
-                )
-            })}
+                                </div>
+                            ) : (
+                                <div>
+                                    <div>
+                                        <p>{comment.content}</p>
+                                    </div>
+
+                                    {(user.profile && comment.author.id === user.profile.id) &&
+                                        <div>
+                                            <button onClick={() => toggleEditComment(comment)}>
+                                                Edit
+                                            </button>
+
+                                            <button onClick={() => deleteComment(comment.id)}>
+                                                Remove
+                                            </button>
+                                        </div>
+                                    }
+                                </div>
+                            )}
+                        </div>
+                    )
+                })
+            )}
         </div >
     )
 }
