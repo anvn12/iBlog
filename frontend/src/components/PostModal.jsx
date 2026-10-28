@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Editor } from '@tinymce/tinymce-react';
 import Modal from 'react-modal';
 
@@ -19,33 +19,28 @@ const customStyles = {
 
 
 function PostModal({
-    modalTitle = "New Post",
-    isOpen = false,
-    setIsOpen,
-    postTitle = "",
-    postContent = "",
-    published = true,
-    setPostTitle,
-    setPostContent,
-    setPublished,
+    modalController,
+    originalPost = {},
     targetFunction,
     validationErrors
 }) {
     const editorRef = useRef(null);
 
-    function closeModal() {
-        setIsOpen(false);
-    }
 
-    function handleChangePostTitle(event) {
-        setPostTitle(event.target.value);
+    const [title, setTitle] = useState(originalPost.title || "");
+    const [content, setContent] = useState(originalPost.content || "");
+    const [published, setPublished] = useState(originalPost.published || true);
+
+    function handleChangeTitle(event) {
+        setTitle(event.target.value);
     }
-    function handleChangePostContent(value) {
-        setPostContent(value);
+    function handleChangeContent(value) {
+        setContent(value);
     }
     function handleChangePublished(event) {
         setPublished(event.target.value);
     }
+
 
     function getFieldError(fieldName) {
         return validationErrors
@@ -60,13 +55,13 @@ function PostModal({
 
     return (
         <Modal
-            isOpen={isOpen}
-            onRequestClose={closeModal}
+            isOpen={modalController.isOpen}
+            onRequestClose={modalController.closeModal}
             style={customStyles}
             contentLabel="Post Modal"
         >
             <div>
-                <h2>{modalTitle}</h2>
+                <h2>{modalController.title}</h2>
             </div>
 
             <div>
@@ -78,8 +73,8 @@ function PostModal({
                         placeholder="Title"
                         name="title"
                         id="title"
-                        value={postTitle}
-                        onChange={handleChangePostTitle}
+                        value={title}
+                        onChange={handleChangeTitle}
                     />
                 </div>
 
@@ -103,8 +98,8 @@ function PostModal({
                             branding: false,
                             placeholder: 'Content',
                         }}
-                        value={postContent}
-                        onEditorChange={handleChangePostContent}
+                        value={content}
+                        onEditorChange={handleChangeContent}
                     />
                 </div>
 
@@ -123,15 +118,16 @@ function PostModal({
             </div>
 
             <div>
-                {postTitle.length === 0 ? (
-                    <button onClick={targetFunction} disabled>Post</button>
+                {title.length === 0 ? (
+                    <button onClick={() => targetFunction(title, content, published)} disabled>Post</button>
                 ) : (
-                    <button onClick={targetFunction}>Post</button>
+                    <button onClick={() => targetFunction(title, content, published)}>Post</button>
                 )}
-                <button onClick={closeModal}>Cancel</button>
+
+                <button onClick={() => modalController.closeModal()}>Cancel</button>
             </div>
         </Modal>
     )
 }
 
-export default PostModal;
+export default PostModal

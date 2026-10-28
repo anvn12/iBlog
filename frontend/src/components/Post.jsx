@@ -4,8 +4,9 @@ import AuthContext from "../context/AuthContext";
 import parse from 'html-react-parser';
 import DOMPurify from 'dompurify';
 
-import PostModal from "./PostModal";
 import Comment from "./Comment";
+import PostModal from "./PostModal";
+import ModalController from "./ModalController";
 
 
 const POSTS_URL = import.meta.env.VITE_SERVER_URL + "/posts";
@@ -30,14 +31,7 @@ function Post() {
                 const res = await fetch(SERVER_POSTS_ID_URL);
                 const result = await res.json();
 
-                console.log('resut', result);
-
-
                 setPost(result.post);
-
-                setPostTitle(result.post.title);
-                setPostContent(result.post.content);
-                setPublished(result.post.published);
             } catch (err) {
                 console.error(err);
             }
@@ -47,19 +41,34 @@ function Post() {
     }, [SERVER_POSTS_ID_URL, reloadPost]);
 
 
-    // edit post modal
-    const [validationErrors, setValidationErrors] = useState([]);
-    const [isPostModalOpen, setIsPostModalOpen] = useState(false);
-    const [postTitle, setPostTitle] = useState("");
-    const [postContent, setPostContent] = useState("");
-    const [published, setPublished] = useState(true);
+    async function deletePost() {
+        try {
+            const res = await fetch(SERVER_POSTS_ID_URL, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${user.JWT}`
+                }
+            });
 
-    function openNewPostModal() {
-        setValidationErrors([]);
-        setIsPostModalOpen(true);
+            if (!res.ok) {
+                return;
+            }
+
+            navigate('/');
+        } catch (err) {
+            console.error(err);
+        }
     }
 
-    async function editPost() {
+
+    // edit post modal
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [validationErrors, setValidationErrors] = useState([]);
+    const modalController = new ModalController("Edit Post", modalIsOpen, setModalIsOpen)
+
+
+    async function editPost(title, content, published) {
         try {
             const res = await fetch(SERVER_POSTS_ID_URL, {
                 method: "PUT",
@@ -68,8 +77,8 @@ function Post() {
                     "Authorization": `Bearer ${user.JWT}`
                 },
                 body: JSON.stringify({
-                    title: postTitle.trim(),
-                    content: postContent.trim() || "",
+                    title: title.trim(),
+                    content: content.trim() || "",
                     published
                 })
             });
@@ -84,31 +93,11 @@ function Post() {
             }
 
             setValidationErrors([]);
-            setIsPostModalOpen(false);
+            modalController.closeModal()
+
             reload();
         } catch (err) {
             console.error(err);
-        }
-    }
-    async function deletePost() {
-        try {
-            const res = await fetch(SERVER_POSTS_ID_URL, {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${user.JWT}`
-                }
-            });
-
-            if (!res.ok) {
-                // setError(result.error || result.message || "Failed to delete post.");
-                return;
-            }
-
-            navigate('/');
-        } catch (err) {
-            console.error(err);
-            // setError("Unable to connect to the server. Please try again later.");
         }
     }
 
@@ -145,7 +134,13 @@ function Post() {
 
                 {(user.profile && post.author.id === user.profile.id) &&
                     <div>
-                        <button onClick={openNewPostModal}>Edit</button>
+                        <button onClick={() => {
+                            setValidationErrors([]);
+                            modalController.openModal()
+                        }}>
+                            Edit
+                        </button>
+
                         <button onClick={deletePost}>Remove</button>
                     </div>
                 }
@@ -164,15 +159,8 @@ function Post() {
 
             <div>
                 <PostModal
-                    modalTitle="Edit Post"
-                    isOpen={isPostModalOpen}
-                    setIsOpen={setIsPostModalOpen}
-                    postTitle={postTitle}
-                    postContent={postContent}
-                    published={published}
-                    setPostTitle={setPostTitle}
-                    setPostContent={setPostContent}
-                    setPublished={setPublished}
+                    modalController={modalController}
+                    originalPost={post}
                     targetFunction={editPost}
                     validationErrors={validationErrors}
                 />
