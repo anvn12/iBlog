@@ -10,6 +10,14 @@ function Comment({
 }) {
     const [commentContent, setCommentContent] = useState("");
     const [validationErrors, setValidationErrors] = useState([]);
+    const [editingComment, setEditingComment] = useState({
+        status: false,
+        commentId: "",
+        content: "",
+    });
+
+    const COMMENTS_URL = `${SERVER_POSTS_ID_URL}/comments`;
+
 
     function handleChangeCommentContent(event) {
         setCommentContent(event.target.value);
@@ -19,10 +27,8 @@ function Comment({
         event.preventDefault();
         setValidationErrors([]);
 
-        const TARGET_URL = `${SERVER_POSTS_ID_URL}/comments`;
-
         try {
-            const res = await fetch(TARGET_URL, {
+            const res = await fetch(COMMENTS_URL, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -48,7 +54,7 @@ function Comment({
     }
 
     async function deleteComment(commentId) {
-        const TARGET_URL = `${SERVER_POSTS_ID_URL}/comments/${commentId}`;
+        const TARGET_URL = `${COMMENTS_URL}/${commentId}`;
 
         try {
             const res = await fetch(TARGET_URL, {
@@ -70,6 +76,61 @@ function Comment({
     }
 
 
+    // Edit comment
+    function toggleEditComment(comment) {
+        console.log("clicked edit");
+
+        setEditingComment({
+            status: true,
+            commentId: comment.id,
+            content: comment.content,
+        })
+    }
+    function handleChangeEditingCommentContent(event) {
+        setEditingComment({
+            ...editingComment,
+            content: event.target.value,
+        })
+    }
+    function closeEditingComment() {
+        setEditingComment({
+            ...editingComment,
+            status: false,
+        })
+    }
+    async function saveEditingComment() {
+        const TARGET_URL = `${COMMENTS_URL}/${editingComment.commentId}`;
+
+        try {
+            const res = await fetch(TARGET_URL, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${user.JWT}`
+                },
+                body: JSON.stringify({
+                    content: editingComment.content.trim() || "",
+                })
+            });
+
+            const result = await res.json();
+
+            if (!res.ok) {
+                if (result.errors) {
+                    setValidationErrors(result.errors);
+                }
+                return;
+            }
+
+            closeEditingComment();
+            reload();
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+
+    // error message
     function getFieldError(fieldName) {
         return validationErrors
             .filter((error) => error.path === fieldName)
@@ -97,10 +158,8 @@ function Comment({
                             placeholder="Comment"
                         />
 
-                        {commentContent ? (
+                        {commentContent && (
                             <button type="submit">Post</button>
-                        ) : (
-                            <button type="submit" disabled>Post</button>
                         )}
                     </form>
                 ) : (
@@ -112,7 +171,7 @@ function Comment({
             {comments && comments.map(comment => {
                 return (
                     <div key={comment.id}>
-                        <p>
+                        <div>
                             <span>
                                 <Link to={"/users/" + comment.author.id}>{comment.author.username}</Link>
                             </span>
@@ -122,22 +181,51 @@ function Comment({
                             <span>
                                 {(new Date(comment.updatedAt).toLocaleDateString())}
                             </span>
-                        </p>
+                        </div>
 
-                        <p>{comment.content}</p>
+                        {(editingComment.status === true &&
+                            editingComment.commentId === comment.id) ? (
 
-                        {/* {(user.profile && comment.author.id === user.profile.id) &&
-                                <button onClick={() => editComment(comment.id)}>Edit</button>
-                            } */}
+                            <div>
+                                <input
+                                    type="text"
+                                    value={editingComment.content}
+                                    onChange={handleChangeEditingCommentContent}
+                                />
 
-                        {
-                            (user.profile && comment.author.id === user.profile.id) &&
-                            <button onClick={() => deleteComment(comment.id)}>Remove</button>
-                        }
+                                <div>
+                                    <button onClick={saveEditingComment}>
+                                        Save
+                                    </button>
+
+                                    <button onClick={closeEditingComment}>
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div>
+                                <div>
+                                    <p>{comment.content}</p>
+                                </div>
+
+                                {(user.profile && comment.author.id === user.profile.id) &&
+                                    <div>
+                                        <button onClick={() => toggleEditComment(comment)}>
+                                            Edit
+                                        </button>
+
+                                        <button onClick={() => deleteComment(comment.id)}>
+                                            Remove
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        )}
                     </div>
                 )
             })}
-        </div>
+        </div >
     )
 }
 

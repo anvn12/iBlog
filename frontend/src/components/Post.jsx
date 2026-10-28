@@ -60,15 +60,6 @@ function Post() {
     }
 
     async function editPost() {
-
-        const bodycon = {
-            title: postTitle.trim(),
-            content: postContent.trim() || "",
-            published
-        }
-        console.log(bodycon);
-
-
         try {
             const res = await fetch(SERVER_POSTS_ID_URL, {
                 method: "PUT",
@@ -145,8 +136,11 @@ function Post() {
                         </Link>
                     </p>
 
-                    {/* <p>{post.createdAt && "createdAt: " + (new Date(post.createdAt).toLocaleDateString())}</p> */}
-                    {/* <p>{post.updatedAt && "updatedAt: " + (new Date(post.updatedAt).toLocaleDateString())}</p> */}
+                    <p>
+                        {post.createdAt && "Created at: " + (new Date(post.createdAt).toLocaleDateString())}
+                        &nbsp;
+                        {post.updatedAt && "Updated at: " + (new Date(post.updatedAt).toLocaleDateString())}
+                    </p>
                 </div>
 
                 {(user.profile && post.author.id === user.profile.id) &&
