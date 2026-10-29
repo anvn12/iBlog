@@ -5,7 +5,18 @@ const cors = require("cors");
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
+const allowedOrigins = process.env.FRONTEND_URL
+	? process.env.FRONTEND_URL.split(",").map((origin) => origin.trim())
+	: "*";
+
+app.use(
+	cors({
+		origin: allowedOrigins === "*" ? "*" : allowedOrigins,
+		credentials: true,
+		methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+		allowedHeaders: ["Content-Type", "Authorization"],
+	})
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
