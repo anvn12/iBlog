@@ -11,7 +11,7 @@
 		"dev": "node --watch src/app.js",
 		"build": "npm install && npx prisma generate && npx prisma db push",
 		"postinstall": "prisma generate",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "jest --watch"
 	},
 	"dependencies": {
 		"@prisma/adapter-pg": "^7.10.0",
@@ -27,6 +27,8 @@
 		"pg": "^8.23.1"
 	},
 	"devDependencies": {
-		"prisma": "^7.10.0"
+		"jest": "^30.5.2",
+		"prisma": "^7.10.0",
+		"supertest": "^7.3.1"
 	}
 }
