@@ -2,10 +2,10 @@ const request = require("supertest");
 const express = require("express");
 const app = express();
 
-const index = require("../src/routes/index");
+const indexRouter = require("../src/routes/index");
 
 app.use(express.urlencoded({ extended: false }));
-app.use("/", index);
+app.use("/", indexRouter);
 
 describe("Index / Healthcheck Routes", () => {
 	test("GET / should return 200 and greeting message", done => {

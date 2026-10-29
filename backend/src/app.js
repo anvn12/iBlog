@@ -42,10 +42,14 @@ app.use((err, req, res, next) => {
 	res.status(500).json({ error: "Internal Server Error" });
 });
 
-app.listen(PORT, (err) => {
-	if (err) {
-		console.error(err);
-		return;
-	}
-	console.log(`Server is running on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== "test") {
+	app.listen(PORT, (err) => {
+		if (err) {
+			console.error(err);
+			return;
+		}
+		console.log(`Server is running on http://localhost:${PORT}`);
+	});
+}
+
+module.exports = app;
